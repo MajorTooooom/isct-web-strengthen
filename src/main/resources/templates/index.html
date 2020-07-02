@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<!--框架 Start-->
+<script th:src="@{/framework/jquery/jquery-3.5.1.js}"></script>
+<script th:src="@{/framework/vue/vue.js}"></script>
+<script th:src="@{/framework/element-ui-2.13.2/lib/index.js}"></script>
+<link rel="stylesheet" th:href="@{/framework/element-ui-2.13.2/lib/theme-chalk/index.css}">
+<!--框架 End-->
+<!--custom css/js Start-->
+<link rel="stylesheet" th:href="@{/css/elementui-layout.css}">
+<link rel="stylesheet" th:href="@{/css/main-index.css}">
+<link rel="stylesheet" href="../static/framework/animate/animate.min.css">
+<link rel="stylesheet" href="../static/framework/csshake/csshake.css">
+<!--custom css/js End-->
+<title>首页</title>
+</head>
+<body>
+<div class="placeholder-1"><!--placeholder--></div>
+<div id="app-main-content">
+    <el-row>
+        <el-col :span="8">
+            <div class="grid-content bg-purple"></div>
+        </el-col>
+        <el-col :span="8">
+            <div class="grid-content bg-purple-light text-align">
+                <div class="text-align" style="display: none;" id="logo">
+                    <a href="/toBusiness">
+                        <img class="shake shake-hard" th:src="@{/img/cat-day.png}" height="200" width="200"/>
+                    </a>
+                </div>
+            </div>
+        </el-col>
+        <el-col :span="8">
+            <div class="grid-content bg-purple"></div>
+        </el-col>
+    </el-row>
+</div>
+<div id="notification-index-first"></div>
+<div id="business-divider-bottom" class="divider-index">
+    <el-divider content-position="right">
+        by 多罗罗丶
+    </el-divider>
+</div>
+</body>
+<script th:src="@{/js/vue-object-index.js}">// 绑定vue对象</script>
+<script th:src="@{/component/vue-component-business.js}">// 组件</script>
+<script th:src="@{/js/animate-index.js}">// 组件</script>
+</html>

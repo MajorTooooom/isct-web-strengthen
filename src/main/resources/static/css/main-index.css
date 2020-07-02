@@ -1,0 +1,18 @@
+#app-main-content {
+    /*https://www.runoob.com/cssref/func-calc.html*/
+    /*两个注意点：（1）运算符前后必须留空格；（2）多层运算需要再套calc(),直接括号会报错*/
+    /*margin-top: calc(calc(100vh - 300px) / 2);*/
+}
+
+.placeholder-1 {
+    height: calc(calc(100vh - 300px) / 2);
+    min-height: 100px;
+}
+
+
+.text-align {
+    text-align: center;
+}
+
+.divider-index {
+}

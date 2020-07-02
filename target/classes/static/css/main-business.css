@@ -1,0 +1,34 @@
+li {
+    list-style: none;
+}
+
+.text-align {
+    text-align: center;
+}
+
+.menu-style {
+    position: absolute;
+    right: 35px;
+    top: 35px;
+    z-index: 1;
+}
+
+#business-steps {
+    z-index: -999;
+}
+
+#business-tabs .tabContext {
+    min-height: 250px;
+    /*background-color: #8f9995;*/
+    border: #91d5ff 1px solid;
+    border-radius: 6px;
+}
+
+.tableSelect {
+    padding-top: 25px;
+    text-align: center;
+}
+
+.selectSummit {
+    bottom: 15px;
+}

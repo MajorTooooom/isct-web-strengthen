@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>never work overtime</title>
+<!--框架 Start-->
+<script src="../static/framework/jquery/jquery-3.5.1.js"></script>
+<script src="../static/framework/vue/vue.js"></script>
+<script src="../static/framework/element-ui-2.13.2/lib/index.js"></script>
+<link rel="stylesheet" href="../static/framework/element-ui-2.13.2/lib/theme-chalk/index.css">
+<!--框架 End-->
+<!--custom css/js Start-->
+<link rel="stylesheet" href="../static/css/main-business.css">
+<link rel="stylesheet" href="../static/framework/csshake/csshake.css">
+<script src="../static/js/event-business.js"></script>
+<script src="../static/js/animate-business.js"></script>
+<link rel="stylesheet" href="../static/framework/font-awesome-4.7.0/css/font-awesome.css">
+<!--custom css/js End-->
+</head>
+<body>
+<div id="business-divider-top">
+    <el-divider content-position="center">
+        <i class="fa fa-clone" aria-hidden="true"></i>
+    </el-divider>
+</div>
+<div id="vue-main-drawer">
+    <div class="menu-style">
+        <el-button @click="drawer = true" style="margin-left: 16px;" type="primary" plain :icon="icon">MENU</el-button>
+    </div>
+    <el-drawer :visible.sync="drawer" :direction="direction" :withHeader="false" :size="size" :show-close="false">
+        <div class="text-align">
+            <div class="text-align backToIndex-2">
+                <p><img src="../static/img/cat-day.png" height="64" width="64" class="shake shake-hard"/></p>
+            </div>
+        </div>
+    </el-drawer>
+</div>
+<!--<div style="height: 60px"></div>-->
+<div id="business-steps">
+    <el-steps :active="curActive" align-center>
+        <el-step title="步骤1" description="选择数据"></el-step>
+        <el-step title="步骤2" description=""></el-step>
+        <el-step title="步骤3" description=""></el-step>
+        <el-step title="步骤4" description=""></el-step>
+    </el-steps>
+</div>
+<div id="business-tabs">
+    <el-tabs v-model="activeName" @tab-click="handleClick" tab-position="left">
+        <el-tab-pane label="选择表格" name="first">
+            <div class="tabContext tableSelect">
+                <el-select v-model="selectArray" filterable clearable multiple placeholder="请选择" :style="{width:'80%'}" @focus="messageForSelect">
+                    <el-option v-for="(item,index) in selectDataTableNames" :key="index" :label="item.label" :value="item.value"></el-option>
+                </el-select>
+                <!--预览-->
+                <ul v-for="(item,index) in selectArray" style="text-align: left">
+                    <li>{{selectArray[index]}}</li>
+                </ul>
+            </div>
+            <div class="selectSummit" style="text-align: center">
+                <el-button type="success" plain @click="selectSummit">确认使用以上表格</el-button>
+            </div>
+        </el-tab-pane>
+        <el-tab-pane label="选择字段" name="second">
+            <div class="tabContext">
+                <div>
+                    <el-table
+                            ref="multipleTable"
+                            :data="tableData"
+                            tooltip-effect="dark"
+                            style="width: 100%"
+                            @selection-change="handleSelectionChange">
+                        <el-table-column
+                                type="selection"
+                                width="55">
+                        </el-table-column>
+                        <el-table-column
+                                label="日期"
+                                width="120">
+                            <template slot-scope="scope">{{ scope.row.date }}</template>
+                        </el-table-column>
+                        <el-table-column
+                                prop="name"
+                                label="姓名"
+                                width="120">
+                        </el-table-column>
+                        <el-table-column
+                                prop="address"
+                                label="地址"
+                                show-overflow-tooltip>
+                        </el-table-column>
+                    </el-table>
+                </div>
+            </div>
+        </el-tab-pane>
+        <el-tab-pane label="角色管理" name="third">
+            <div class="tabContext">内容3</div>
+        </el-tab-pane>
+        <el-tab-pane label="定时任务补偿" name="fourth">
+            <div class="tabContext">内容4</div>
+        </el-tab-pane>
+    </el-tabs>
+</div>
+<div id="notificationBusiness"></div>
+</body>
+<!-------------------------------------------------------------------------------------------------------------------------------->
+<script type="text/template" id="">
+
+</script>
+<!-------------------------------------------------------------------------------------------------------------------------------->
+<!--custom css/js Start 需要放在<script type="text/template"</script>的后面，因为要用它里面的代码-->
+<script src="../static/component/vue-component-business.js"></script>
+<script src="../static/js/vue-object-business.js"></script>
+<!--custom css/js End-->
+<!-------------------------------------------------------------------------------------------------------------------------------->
+</html>
