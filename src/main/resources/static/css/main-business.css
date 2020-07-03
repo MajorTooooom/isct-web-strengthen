@@ -2,13 +2,17 @@ li {
     list-style: none;
 }
 
-.text-align {
+.text-align, .textAlign {
     text-align: center;
+}
+
+.textLeft, .text-left {
+    text-align: left;
 }
 
 .menu-style {
     position: absolute;
-    right: 35px;
+    left: 35px;
     top: 35px;
     z-index: 1;
 }
@@ -18,16 +22,12 @@ li {
 }
 
 #business-tabs .tabContext {
-    min-height: 250px;
+    min-height: 450px;
     /*background-color: #8f9995;*/
     border: #2f34ff 2px solid;
     border-radius: 6px;
 }
 
-.tableSelect {
-    padding-top: 25px;
-    text-align: center;
-}
 
 .selectSummit {
     bottom: 15px;
@@ -50,6 +50,17 @@ li {
 /**
 修改elementUI的默认样式，让表头居中
  */
- .el-table th {
+.el-table th {
     text-align: center !important;
+}
+
+
+.vueClassTabBaneCol {
+    /*background-color: red;*/
+    /*border: 1px green solid;*/
+}
+
+
+.globalFontFamily {
+    color: red;
 }

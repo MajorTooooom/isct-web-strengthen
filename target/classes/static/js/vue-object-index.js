@@ -5,9 +5,9 @@ var vueObjectNotificationIndexFirst = new Vue({
         openNotifiction() {
             this.$notify({
                 title: '你发现了一些奇怪的东西',
-                message: '尝试点击看看',
+                message: '尝试探索一下',
                 offset: 100,
-                duration: 10000
+                duration: 0
             });
         }
     }

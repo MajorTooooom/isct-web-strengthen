@@ -1,21 +1,34 @@
-new Vue({el: '#business-divider-top'});
-// new Vue({el: '#business-divider-bottom'});
+//============================================================================================================================================================================
+new Vue({el: '#business-divider-top'});//一个顶部的切割线组件
+new Vue({el: '#backToTop', data: {vhHeight: 15}});//一个回到顶部的组件
+new Vue({el: '#asdasdasdasdadas', data: {vhHeight: 15}});//一个回到顶部的组件
+
+//============================================================================================================================================================================
 /**
- *主抽屉
- * 含组件
+ *主抽屉组件：左侧边栏组件
+ * 含组件,组件的属性放到一起
  * @type {Vue}
  */
 var vueObjectMainDrawer = new Vue({
     el: "#vue-main-drawer",
-    data() {
-        return {
-            drawer: true,
-            direction: 'ltr',
-            size: '20%',
-            icon: 'el-icon-s-tools',
-        };
-    },
+    data: {
+        drawer: true,
+        //方向左边向右打开
+        direction: 'ltr',
+        size: '20%',
+        icon: 'el-icon-s-tools',
+        //我的自定义属性对象
+        myObjects: {
+            imgSrc: 'static/img/cat-day.png',// 头像地址
+            systemMessage: {status: '未连接....', time: ''}
+        }
+    }
 });
+//============================================================================================================================================================================
+/**
+ * notification消息提醒组件
+ * @type {Vue}
+ */
 var notificationBusiness = new Vue({
     el: '#notificationBusiness',
     data: {
@@ -36,7 +49,11 @@ var notificationBusiness = new Vue({
         }
     }
 });
-
+//============================================================================================================================================================================
+/**
+ * 步骤条组件
+ * @type {Vue}
+ */
 var vueObjectSteps = new Vue({
     el: '#business-steps',
     data: {
@@ -45,7 +62,12 @@ var vueObjectSteps = new Vue({
     }
 });
 //============================================================================================================================================================================
-//标签tabs,因为Vue.js无法实现嵌套绑定（即对象套对象），所以这个标签需要多为很多对象的顶级标签
+/**
+ *标签tabs组件
+ * 因为其下元素是主要的展示区，而VueJs模式下不允许嵌套绑定对象的设定，所以其他很多组件添加的话需要挂在
+ * 这个Vue对象下，所以很多data属性值或者方法需要对方在一起，需要结合注释进行区分；
+ * @type {Vue}
+ */
 var vueObjectBusinessTabs = new Vue({
     el: '#business-tabs',
     data() {
@@ -58,15 +80,25 @@ var vueObjectBusinessTabs = new Vue({
             selectArray: '',
             msgStatus: 0,
             //table表格部分
-            tableFieldData: []
+            tableFieldData: [],
+            //存放其他自定义的信息
+            myObjects: {myCurrentTime: ''}
         };
     },
     methods: {
         // tabs方法
+        /**
+         *tabs被点击切换时间
+         * @param tab
+         * @param event
+         */
         handleClick(tab, event) {
             // console.log(tab, event);
             if (this.activeName == 'first') {
                 vueObjectSteps.curActive = 0;
+                CarouselWithAlertObj.showCarouselWithAlert = true;
+            } else {
+                CarouselWithAlertObj.showCarouselWithAlert = false;
             }
             if (this.activeName == 'second') {
                 vueObjectSteps.curActive = 1;
@@ -80,7 +112,7 @@ var vueObjectBusinessTabs = new Vue({
         },
         messageForSelect() {
             this.msgStatus++;
-            console.log(this.msgStatus);
+            // console.log(this.msgStatus);
             if (this.msgStatus < 3) {
                 this.$message({
                     message: '当前选择框支持以下功能：多选、可搜索、清空',
@@ -104,6 +136,7 @@ var vueObjectBusinessTabs = new Vue({
                     message: '切换到字段视图',
                     type: 'success'
                 });
+                CarouselWithAlertObj.showCarouselWithAlert = false;//联动
                 vueObjectSteps.curActive = 1;//步骤组件也切换
             }
         },
@@ -153,7 +186,11 @@ var vueObjectBusinessTabs = new Vue({
     }
 });
 //============================================================================================================================================================================
-// 抽方法
+//
+/**
+ * 方法区：Vue对象需要用到的方法进行封装
+ */
+
 /**
  * 给列表元素添加可拓展插件支持
  */
@@ -179,5 +216,18 @@ function bulidSortableAfterGetData() {
             })
         }
     });
-    // ==================================================
 }
+
+//============================================================================================================================================================================
+var CarouselWithAlertObj = new Vue({
+    el: '#CarouselWithAlert',
+    data: {
+        showCarouselWithAlert: true,
+        helpMessages: [
+            {title: '选择表格', type: 'success', description: '表格加载完成后，点击下拉框选择表格，所选表格将加载其全部字段'},
+            {title: '下拉框支持功能', type: 'warning', description: '当前选择框支持以下功能：多选、可搜索、清空'},
+            {title: '点击USE按钮进行界面跳转', type: 'info', description: '表格加载完成后，点击下拉框选择表格，所选表格将加载其全部字段'}
+        ]
+    }
+});
+//============================================================================================================================================================================
