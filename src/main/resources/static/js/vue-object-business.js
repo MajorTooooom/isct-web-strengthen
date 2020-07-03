@@ -57,37 +57,8 @@ var vueObjectBusinessTabs = new Vue({
             selectDataTableNames: [],
             selectArray: '',
             msgStatus: 0,
-            //表格
-            tableData: [{
-                date: '2016-05-03',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }, {
-                date: '2016-05-02',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }, {
-                date: '2016-05-04',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }, {
-                date: '2016-05-01',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }, {
-                date: '2016-05-08',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }, {
-                date: '2016-05-06',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }, {
-                date: '2016-05-07',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            }],
-            multipleSelection: []
+            //table表格部分
+            tableFieldData: []
         };
     },
     methods: {
@@ -117,28 +88,96 @@ var vueObjectBusinessTabs = new Vue({
                 });
             }
         },
+        /**
+         *选择了表格之后的确认&跳转事件
+         */
         selectSummit() {
-            this.activeName = 'second';//切换tabs
-            // 放一条提示信息
-            this.$message({
-                message: '切换到字段视图',
-                type: 'success'
-            });
-            vueObjectSteps.curActive = 1;//步骤组件也切换
-        },
-        //表格
-        toggleSelection(rows) {
-            if (rows) {
-                rows.forEach(row => {
-                    this.$refs.multipleTable.toggleRowSelection(row);
+            if (this.selectArray.length <= 0) {
+                this.$message({
+                    message: '然而，你并没有选择任何数据',
+                    type: 'warning'
                 });
             } else {
-                this.$refs.multipleTable.clearSelection();
+                this.activeName = 'second';//切换tabs
+                // 放一条提示信息
+                this.$message({
+                    message: '切换到字段视图',
+                    type: 'success'
+                });
+                vueObjectSteps.curActive = 1;//步骤组件也切换
             }
         },
-        handleSelectionChange(val) {
-            this.multipleSelection = val;
+        /**
+         * 为表格隔行换色的方法
+         * @param row
+         * @param rowIndex
+         * @returns {string}
+         */
+        tableRowClassName({row, rowIndex}) {
+            if (rowIndex % 2 === 0) {
+                return 'warning-row';
+            }
+            return '';
+        },
+        /**
+         * 加载表的全部字段
+         */
+        loadTableFields() {
+            let tables = this.selectArray;
+            if (tables.length == 0) {
+                this.$message({
+                    message: '请选择只是一张表格',
+                    type: 'warning'
+                });
+                return false;
+            }
+            // this.tableData.push({TABLE_NAME:123});
+            $.ajax({
+                url: '/loadtablefields',
+                type: 'post',
+                traditional: true,
+                data: {tables: tables},
+                dataType: 'json',
+                beforeSend: function () {
+                },
+                success: function (data) {
+                    vueObjectBusinessTabs.tableFieldData = data.data;
+                    bulidSortableAfterGetData();//对表格做可拓展的增强处理
+                },
+                complement: function () {
+
+                }
+            });
+
         }
     }
 });
 //============================================================================================================================================================================
+// 抽方法
+/**
+ * 给列表元素添加可拓展插件支持
+ */
+function bulidSortableAfterGetData() {
+    // ==================================================
+    var el = $(".tableDocker tbody:first").get(0);//选中ul类型的元素，这里因为是ElementUI渲染出来的所以是tbody下面一组tr;然后将jQuery对象转成js对象，因为这是Sortable.min.js插件要求的
+    var sortable = Sortable.create(el, {
+        // 参数列表，参考http://www.sortablejs.com/             或者 https://www.jianshu.com/p/887ab28bdea0
+        animation: 150,
+        ghostClass: 'blue-background-class',
+        /**
+         * 每次拖拽结束事件
+         * @param evt
+         */
+        onEnd: function (/**Event*/evt) {
+            // 每次拖拽后刷新排序值，
+            var tableTbody = $(".tableDocker tbody:first>tr");//tr对象数组
+            $.each(tableTbody, function (index, domElement) {
+                var temp = domElement.getElementsByTagName("td")[0];//拿到第一个td
+                // var temp = domElement.children("td").eq(0);
+                var nextTemp = temp.getElementsByTagName("div")[0].getElementsByTagName("div")[0];
+                nextTemp.innerHTML = index + 1;//注意是等于号，不是方法
+            })
+        }
+    });
+    // ==================================================
+}

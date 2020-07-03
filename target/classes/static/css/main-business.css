@@ -20,7 +20,7 @@ li {
 #business-tabs .tabContext {
     min-height: 250px;
     /*background-color: #8f9995;*/
-    border: #91d5ff 1px solid;
+    border: #2f34ff 2px solid;
     border-radius: 6px;
 }
 
@@ -31,4 +31,25 @@ li {
 
 .selectSummit {
     bottom: 15px;
+}
+
+/**
+表格相关的样式
+ */
+.el-table .warning-row {
+    background: oldlace;
+}
+
+/**
+表格相关的样式
+ */
+.el-table .success-row {
+    background: #f0f9eb;
+}
+
+/**
+修改elementUI的默认样式，让表头居中
+ */
+ .el-table th {
+    text-align: center !important;
 }

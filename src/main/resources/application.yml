@@ -1,6 +1,9 @@
 server:
   port: 6688
 spring:
+  thymeleaf:
+    cache: false
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://192.168.8.141:3306/scm?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true
@@ -13,6 +16,7 @@ spring:
     maxActive: 200
     #配置获取连接等待超时的时间
     maxWait: 10000
+
 #    timeBetweenEvictionRunsMillis: 60000
 #    minEvictableIdleTimeMillis: 300000
 #    validationQuery: SELECT 1 FROM DUAL

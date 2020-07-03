@@ -7,14 +7,15 @@
 <script src="../static/framework/jquery/jquery-3.5.1.js"></script>
 <script src="../static/framework/vue/vue.js"></script>
 <script src="../static/framework/element-ui-2.13.2/lib/index.js"></script>
+<script src="../static/framework/sortable/Sortable.min.js"></script>
+<link rel="stylesheet" href="../static/framework/csshake/csshake.css">
+<link rel="stylesheet" href="../static/framework/font-awesome-4.7.0/css/font-awesome.css">
 <link rel="stylesheet" href="../static/framework/element-ui-2.13.2/lib/theme-chalk/index.css">
 <!--框架 End-->
 <!--custom css/js Start-->
 <link rel="stylesheet" href="../static/css/main-business.css">
-<link rel="stylesheet" href="../static/framework/csshake/csshake.css">
 <script src="../static/js/event-business.js"></script>
 <script src="../static/js/animate-business.js"></script>
-<link rel="stylesheet" href="../static/framework/font-awesome-4.7.0/css/font-awesome.css">
 <!--custom css/js End-->
 </head>
 <body>
@@ -48,7 +49,11 @@
     <el-tabs v-model="activeName" @tab-click="handleClick" tab-position="left">
         <el-tab-pane label="选择表格" name="first">
             <div class="tabContext tableSelect">
-                <el-select v-model="selectArray" filterable clearable multiple placeholder="请选择" :style="{width:'80%'}" @focus="messageForSelect">
+                <div class="selectSummit" style="text-align: center;">
+                    <el-button type="success" plain @click="selectSummit">确认使用以下表格</el-button>
+                </div>
+                <!--【select组件】-->
+                <el-select v-model="selectArray" filterable clearable multiple placeholder="请选择" :style="{width:'80%',border:'#2f34ff 2px solid',borderRadius:'4px'}" @focus="messageForSelect">
                     <el-option v-for="(item,index) in selectDataTableNames" :key="index" :label="item.label" :value="item.value"></el-option>
                 </el-select>
                 <!--预览-->
@@ -56,37 +61,47 @@
                     <li>{{selectArray[index]}}</li>
                 </ul>
             </div>
-            <div class="selectSummit" style="text-align: center">
-                <el-button type="success" plain @click="selectSummit">确认使用以上表格</el-button>
-            </div>
         </el-tab-pane>
         <el-tab-pane label="选择字段" name="second">
             <div class="tabContext">
                 <div>
-                    <el-table
-                            ref="multipleTable"
-                            :data="tableData"
-                            tooltip-effect="dark"
-                            style="width: 100%"
-                            @selection-change="handleSelectionChange">
-                        <el-table-column
-                                type="selection"
-                                width="55">
+                    <el-button size="mini" @click="loadTableFields">请手动加载</el-button>
+                </div>
+                <div class="tableDocker">
+                    <el-table :data="tableFieldData" style="width: 100%" :row-class-name="tableRowClassName" stripe border>
+                        <el-table-column type="index" label="sort" width="50"></el-table-column>
+                        <el-table-column prop="TABLE_NAME" label="表名" width="250"></el-table-column>
+                        <!--<el-table-column prop="COLUMN_TYPE" label="字段类型" width="250"></el-table-column>-->
+                        <el-table-column prop="COLUMN_COMMENT" label="字段描述" width="180">
+                            <template slot-scope="scope">
+                                <el-popover trigger="hover" placement="top">
+                                    <!--p标签内容是tag的内容-->
+                                    <p>字段描述: {{ scope.row.COLUMN_COMMENT }}</p>
+                                    <p>字段类型: {{ scope.row.COLUMN_TYPE }}</p>
+                                    <p>表名: {{ scope.row.TABLE_NAME }}</p>
+                                    <p>字段名: {{ scope.row.COLUMN_NAME }}</p>
+                                    <!--slot内容是表格内内容-->
+                                    <div slot="reference" class="name-wrapper">
+                                        <el-tag size="medium">{{ scope.row.COLUMN_COMMENT }}</el-tag>
+                                    </div>
+                                </el-popover>
+                            </template>
                         </el-table-column>
-                        <el-table-column
-                                label="日期"
-                                width="120">
-                            <template slot-scope="scope">{{ scope.row.date }}</template>
-                        </el-table-column>
-                        <el-table-column
-                                prop="name"
-                                label="姓名"
-                                width="120">
-                        </el-table-column>
-                        <el-table-column
-                                prop="address"
-                                label="地址"
-                                show-overflow-tooltip>
+                        <el-table-column prop="COLUMN_NAME" label="字段名" width="180"></el-table-column>
+                        <el-table-column prop="COLUMN_NAME" label="最终字段" width="180">
+                            <template slot="header" slot-scope="scope">
+                                <el-popover
+                                        placement="top-start"
+                                        title="注意事项！"
+                                        width="200"
+                                        trigger="hover"
+                                        content="请注意！考虑到有时候数据库的字段并非我们想要的字段，此列的值是最终期望值">
+                                    <el-button slot="reference">最终提交字段(!)</el-button>
+                                </el-popover>
+                            </template>
+                            <template slot-scope="scope">
+                                <el-input v-model="scope.row.FINAL_COLUMN_NAME"></el-input>
+                            </template>
                         </el-table-column>
                     </el-table>
                 </div>

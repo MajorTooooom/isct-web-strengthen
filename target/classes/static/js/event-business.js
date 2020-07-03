@@ -8,6 +8,9 @@ $(function () {
 });
 
 
+/**
+ *页面加载时读取一次数据库表信息
+ */
 function testConnection() {
     var ajaxTimeOut = $.ajax({
         url: '/startTimeTest',
@@ -36,7 +39,9 @@ function testConnection() {
     })
 }
 
+
 /**
+ * 给选择器填充数据
  * 后台传了List<Map<String,Object>>  例如：name:pur_order
  * UI框架要求格式：[{value:'',label:''},{}]
  * @param list

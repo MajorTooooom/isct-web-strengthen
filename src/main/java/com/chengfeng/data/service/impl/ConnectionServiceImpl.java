@@ -1,7 +1,7 @@
 package com.chengfeng.data.service.impl;
 
 import com.chengfeng.data.service.ConnectionService;
-import com.chengfeng.data.utils.returnMessage;
+import com.chengfeng.data.utils.ReturnMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class ConnectionServiceImpl implements ConnectionService {
                 System.out.println(msg);
                 //同时查询数据库全部表格名称
                 List<Map<String, Object>> list = jdbcTemplate.queryForList("select TABLE_NAME AS name,TABLE_COMMENT as note from INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='scm'  ORDER BY note desc");
-                return returnMessage.build(-1, msg, list);
+                return ReturnMessage.build(-1, msg, list);
             }
         } catch (Exception e) {
             if (e.getClass().getName().equals("org.springframework.jdbc.CannotGetJdbcConnectionException")) {
@@ -35,7 +35,7 @@ public class ConnectionServiceImpl implements ConnectionService {
             } else {
                 msg = e.getMessage();
             }
-            return returnMessage.build(-1, msg);
+            return ReturnMessage.build(-1, msg);
         }
         return null;
     }

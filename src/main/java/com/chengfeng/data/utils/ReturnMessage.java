@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * 返回json格式信息
  */
-public class returnMessage {
+public class ReturnMessage {
     public static String build(int resultCode, String message) {
         Map<String, Object> map = new HashMap<>();
         map.put("resultCode", resultCode);
