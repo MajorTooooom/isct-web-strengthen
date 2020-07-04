@@ -107,9 +107,9 @@ var vueObjectBusinessTabs = new Vue({
             // console.log(tab, event);
             if (this.activeName == 'first') {
                 vueObjectSteps.curActive = 0;
-                CarouselWithAlertObj.showCarouselWithAlert = true;
+                // CarouselWithAlertObj.showCarouselWithAlert = true;
             } else {
-                CarouselWithAlertObj.showCarouselWithAlert = false;
+                // CarouselWithAlertObj.showCarouselWithAlert = false;
             }
             if (this.activeName == 'second') {
                 vueObjectSteps.curActive = 1;
@@ -218,6 +218,39 @@ var vueObjectBusinessTabs = new Vue({
             }
         },
         /**
+         * 指定当前选中的行
+         * 也是利用splice()方法，思路是先删除再添加
+         * @param index
+         * @param row
+         * @param column
+         */
+        topOneJson(index, row, column) {
+            // console.log(index);
+            var temp = {
+                COLUMN_COMMENT: row.COLUMN_COMMENT,
+                COLUMN_NAME: row.COLUMN_NAME,
+                FINAL_COLUMN_NAME: row.COLUMN_NAME,
+                TABLE_NAME: row.TABLE_NAME,
+                index: row.index
+            };
+            // console.log(temp);
+            this.newData.splice(index, 1);//强无敌,注意：一旦调用了splice()方法就已经改变其本身了。意思是在index的位置删除一个元素
+            this.newData.splice(0, 0, temp);//在index=0的位置删除0个元素并添加一个元素temp
+            this.$forceUpdate();//Vue强制刷新组件，解决页面不刷新的问题，而且不用自己更像index
+            this.updateTableFieldData();//更新finalTableData[]
+        },
+        /**
+         * 删除一行
+         * @param index
+         * @param row
+         * @param column
+         */
+        deleteOneJson(index, row, column) {
+            this.newData.splice(index, 1);
+            this.$forceUpdate();//Vue强制刷新组件，解决页面不刷新的问题，而且不用自己更像index
+            this.updateTableFieldData();//更新finalTableData[]
+        },
+        /**
          * 表格组件的方法：在当前选择的行的前面插入一条数据
          * @param index  经测试是页面显示值
          * @param row 经测试是行数据
@@ -236,6 +269,8 @@ var vueObjectBusinessTabs = new Vue({
         },
         /**
          * 表格组件中添加一行按钮的画面中的确认事件
+         * 利用splice()方法
+         * 缺失校验
          * @constructor
          */
         InsertTableParam() {
@@ -247,8 +282,10 @@ var vueObjectBusinessTabs = new Vue({
                 TABLE_NAME: this.TableDialog.form.TABLE_NAME,
                 index: 99999
             };
+            this.TableDialog.dialogFormVisible = false;
             this.newData.splice(insertIndex, 0, temp);//强无敌,注意：一旦调用了splice()方法就已经改变其本身了
-            this.$forceUpdate();//Vue强制刷新组件，解决页面不刷新的问题
+            this.$forceUpdate();//Vue强制刷新组件，解决页面不刷新的问题，而且不用自己更像index
+            this.updateTableFieldData();//更新finalTableData[]
         },
         /**
          * 将手动拓展后的表格数据按照顺序重新封装成Vue数据，然后更新之。
@@ -292,7 +329,9 @@ var vueObjectBusinessTabs = new Vue({
             // console.log(tempNewData);//循环结束后，查看结果，检查通过
             //将新的类别数据给到
             // vueObjectBusinessTabs.newData = tempNewData;
-            this.finalTableData = tempNewData;
+            /*************************************************************【目标】/
+             this.finalTableData = tempNewData;
+             /*************************************************************/
             // console.log(this.newData);
             // console.log(this.finalTableData);
             // this.$forceUpdate();//Vue强制刷新组件，解决页面不刷新的问题
