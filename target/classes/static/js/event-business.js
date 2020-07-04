@@ -25,6 +25,9 @@ function testConnection() {
         beforeSend: function () {
         },
         success: function (data) {
+            /**
+             * 将获取的数据填充到Vue对象，使得select组件填充数据
+             */
             fillSelectDocker(data.data);//将获取的数据填充到Vue对象，使得select组件填充数据
             vueObjectMainDrawer.myObjects.systemMessage.status = '已连接';
             vueObjectBusinessTabs.myObjects.FFFFFFFFFFFFFFFFObj.msg = '已加载表格' + data.data.length + '张';

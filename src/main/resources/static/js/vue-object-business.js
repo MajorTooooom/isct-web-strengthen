@@ -76,9 +76,23 @@ var vueObjectBusinessTabs = new Vue({
         selectDataTableNames: [],
         selectArray: '',
         msgStatus: 0,
-        //table表格部分
+        //table表格部分,tableFieldData主要是用于储存从数据库加载的原始备份，后面在页面无论对于表格怎么操作，都不要影响这个数据
         tableFieldData: [],
-        newData: [],//列表变动之后的新数据集合
+        //用于Vue启动表格组件时候的数据存储，同时与sortable.js交互必须得有一个介质——比如操作dom；此时在直接赋值newData=newData的话会出现问题，可能是2个插件直接的战争，所以方法是不
+        //动这个变量，引入finalTableData，利用原始的变量dom获取数据反组装json数组，给到引入finalTableData[]进行储存；
+        newData: [],
+        finalTableData: [],//页面所有的操作结束之后，会通过dom的方式，从新获取一个json数据，这是目前最好的方案
+        // TableDialog是放在组件内部的隐藏对话框，在table组件的事件里面触发
+        TableDialog: {
+            form: {
+                currentRowIndex: -1,
+                TABLE_NAME: '',
+                COLUMN_COMMENT: '',
+                COLUMN_NAME: ''
+            },
+            dialogFormVisible: false,//初始化不可见
+
+        },
         //存放其他自定义的信息
         myObjects: {myCurrentTime: '', FFFFFFFFFFFFFFFFObj: {msg: '请选择数据源', choose: -1}}
     },
@@ -153,7 +167,6 @@ var vueObjectBusinessTabs = new Vue({
          * 加载表的全部字段
          */
         loadTableFields() {
-            // console.log('cookie=' + $.cookie('cckk'));
             let tables = this.selectArray;
             if (tables.length == 0) {
                 this.$message({
@@ -162,17 +175,21 @@ var vueObjectBusinessTabs = new Vue({
                 });
                 return false;
             }
-            // this.tableData.push({TABLE_NAME:123});
             $.ajax({
+                // 后端服务器查询数据
                 url: '/loadtablefields',
                 type: 'post',
                 traditional: true,
                 data: {tables: tables},
                 dataType: 'json',
                 beforeSend: function () {
+                    vueObjectBusinessTabs.tableFieldData = [];//先清空
+                    vueObjectBusinessTabs.newData = [];//先清空
                 },
                 success: function (data) {
-                    vueObjectBusinessTabs.tableFieldData = data.data;
+                    vueObjectBusinessTabs.tableFieldData = data.data;//原始数据份
+                    vueObjectBusinessTabs.newData = data.data;//首次也要加载动态份
+                    vueObjectBusinessTabs.globalForceUpdate();
                     bulidSortableAfterGetData();//对表格做可拓展的增强处理
                 },
                 complement: function () {
@@ -200,20 +217,91 @@ var vueObjectBusinessTabs = new Vue({
                 alert("cookie代码未实现");
             }
         },
-        InsertTableParam(index) {
-            // console.log("index=" + index);
+        /**
+         * 表格组件的方法：在当前选择的行的前面插入一条数据
+         * @param index  经测试是页面显示值
+         * @param row 经测试是行数据
+         * @param column 经测试时表头信息
+         */
+        addOneJson(index, row, column) {
+            // 此处再打开一个组件dialog对话框
+            //先清空dialog对话框的的内容防止冲突
+            this.TableDialog.form.TABLE_NAME = '';
+            this.TableDialog.form.COLUMN_COMMENT = '';
+            this.TableDialog.form.COLUMN_NAME = '';
+            // 然后设置对话框可见
+            this.TableDialog.dialogFormVisible = true;
+            // 关键配置
+            this.TableDialog.form.currentRowIndex = index;//设置之后，就是对话框的确认按钮之后的事情了即InsertTableParam()
+        },
+        /**
+         * 表格组件中添加一行按钮的画面中的确认事件
+         * @constructor
+         */
+        InsertTableParam() {
+            var insertIndex = this.TableDialog.form.currentRowIndex;
             var temp = {
-                COLUMN_COMMENT: "说明插入成功",
-                COLUMN_NAME: "说明插入成功",
-                FINAL_COLUMN_NAME: "说明插入成功",
-                TABLE_NAME: "说明插入成功",
+                COLUMN_COMMENT: this.TableDialog.form.COLUMN_COMMENT,
+                COLUMN_NAME: this.TableDialog.form.COLUMN_NAME,
+                FINAL_COLUMN_NAME: this.TableDialog.form.COLUMN_NAME,
+                TABLE_NAME: this.TableDialog.form.TABLE_NAME,
                 index: 99999
             };
-            console.log(this.tableFieldData);
-            var b = this.newData;
-            b.splice(2, 0, temp);
-            console.log(b);
-            this.tableFieldData = b;
+            this.newData.splice(insertIndex, 0, temp);//强无敌,注意：一旦调用了splice()方法就已经改变其本身了
+            this.$forceUpdate();//Vue强制刷新组件，解决页面不刷新的问题
+        },
+        /**
+         * 将手动拓展后的表格数据按照顺序重新封装成Vue数据，然后更新之。
+         * ElementUI和sortables.js不互动，所以要自己手动更新数据。
+         */
+        updateTableFieldData() {
+            console.log("更新数据中...........");
+            var tempNewData = [];
+            var tableTbody = $(".tableDocker tbody:first>tr");//tr对象数组
+            // 改造$.each，踩了一坑，因为查阅资料得知这个循环并不是按照页面显示的顺序来遍历的；
+            for (let i = 0; i < tableTbody.length; i++) {
+                $.each(tableTbody, function (index, domElement) {
+                    var td_0 = domElement.getElementsByTagName("td")[0];//拿到第1个td
+                    var td_1 = domElement.getElementsByTagName("td")[1];//拿到第2个td
+                    var td_2 = domElement.getElementsByTagName("td")[2];//拿到第3个td
+                    var td_3 = domElement.getElementsByTagName("td")[3];//拿到第4个td
+                    var td_4 = domElement.getElementsByTagName("td")[4];//拿到第5个td
+                    //从第一列获取序号
+                    var _index = td_0.getElementsByTagName("div")[0].getElementsByTagName("div")[0].innerHTML;
+                    var _TABLE_NAME = td_1.getElementsByTagName("div")[0].innerHTML;
+                    var _COLUMN_COMMENT = $(td_2).find("span[class*='el-tag']")[0].innerText;//$(js对象)是将js对象转jQuery对象；find()是找后代元素，children()是找子元素，“*=”是指包含；jquery除了get()得到是jQuery对象之外，其他find()等方法得到都是js对象
+                    var _COLUMN_NAME = $(td_3).find("div[class='cell']")[0].innerHTML;
+                    var _FINAL_COLUMN_NAME = $($(td_4).find("div[class='el-input']")[0]).find("input[class=el-input__inner]")[0].value;
+                    //从中定位到目标
+                    if ((i + 1) == _index) {
+                        // 都获取之后拼装json数组
+                        tempNewData.push({
+                            index: (_index - 1),//因为页面是序号
+                            TABLE_NAME: _TABLE_NAME,
+                            COLUMN_COMMENT: _COLUMN_COMMENT,
+                            COLUMN_NAME: _COLUMN_NAME,
+                            FINAL_COLUMN_NAME: _FINAL_COLUMN_NAME
+                        });
+                        // jQuery中each不能使用break结束循环，也不能使用continue来结束本次循环，想要实现类似的功能就只能用return,
+                        // break           用return false
+                        // continue      用return true
+                        return true;
+                    }
+                })
+            }
+            // console.log(tempNewData);//循环结束后，查看结果，检查通过
+            //将新的类别数据给到
+            // vueObjectBusinessTabs.newData = tempNewData;
+            this.finalTableData = tempNewData;
+            // console.log(this.newData);
+            // console.log(this.finalTableData);
+            // this.$forceUpdate();//Vue强制刷新组件，解决页面不刷新的问题
+            localStorageController('set', 'tableDataInLocalStorage', JSON.stringify(tempNewData));//存localStorage
+        },
+        /**
+         * 目的是能在这里调用this
+         */
+        globalForceUpdate() {
             this.$forceUpdate();
         }
     }
@@ -235,7 +323,7 @@ function bulidSortableAfterGetData() {
         animation: 150,
         ghostClass: 'blue-background-class',
         /**
-         * 每次拖拽结束事件
+         * 每次拖拽结束事件,这里更新页面展示的序号
          * @param evt
          */
         onEnd: function (/**Event*/evt) {
@@ -247,8 +335,8 @@ function bulidSortableAfterGetData() {
                 var nextTemp = temp.getElementsByTagName("div")[0].getElementsByTagName("div")[0];
                 nextTemp.innerHTML = index + 1;//注意是等于号，不是方法
             })
-            //完成之后刷新Vue对象数据
-            updateTableFieldData();
+            //完成之后更新数据
+            vueObjectBusinessTabs.updateTableFieldData();//实际是调成功的了
         }
     });
 }
@@ -277,39 +365,5 @@ var textingObj = new Vue({
 });
 
 //============================================================================================================================================================================
-/**
- * 将手动拓展后的表格数据按照顺序重新封装成Vue数据，然后更新之。
- * ElementUI和sortables.js不互动，所以要自己手动更新数据。
- */
-function updateTableFieldData() {
-    var tempNewData = [];
-    var tableTbody = $(".tableDocker tbody:first>tr");//tr对象数组
-    $.each(tableTbody, function (index, domElement) {
-        var td_0 = domElement.getElementsByTagName("td")[0];//拿到第1个td
-        var td_1 = domElement.getElementsByTagName("td")[1];//拿到第2个td
-        var td_2 = domElement.getElementsByTagName("td")[2];//拿到第3个td
-        var td_3 = domElement.getElementsByTagName("td")[3];//拿到第4个td
-        var td_4 = domElement.getElementsByTagName("td")[4];//拿到第5个td
-        //从第一列获取序号
-        var _index = td_0.getElementsByTagName("div")[0].getElementsByTagName("div")[0].innerHTML;
-        var _TABLE_NAME = td_1.getElementsByTagName("div")[0].innerHTML;
-        var _COLUMN_COMMENT = $(td_2).find("span[class*='el-tag']")[0].innerText;//$(js对象)是将js对象转jQuery对象；find()是找后代元素，children()是找子元素，“*=”是指包含；jquery除了get()得到是jQuery对象之外，其他find()等方法得到都是js对象
-        var _COLUMN_NAME = $(td_3).find("div[class='cell']")[0].innerHTML;
-        var _FINAL_COLUMN_NAME = $($(td_4).find("div[class='el-input']")[0]).find("input[class=el-input__inner]")[0].value;
-        // 都获取之后拼装json数组
-        tempNewData.push({
-            index: _index - 1,//因为页面是序号
-            TABLE_NAME: _TABLE_NAME,
-            COLUMN_COMMENT: _COLUMN_COMMENT,
-            COLUMN_NAME: _COLUMN_NAME,
-            FINAL_COLUMN_NAME: _FINAL_COLUMN_NAME
-        });
-    })
-    // console.log(newData);//循环结束后，查看结果，检查通过
-    //将新的类别数据给到
-    vueObjectBusinessTabs.newData = tempNewData;
-    localStorageController('set', 'tableDataInLocalStorage', JSON.stringify(tempNewData));//存localStorage
-
-}
 
 //============================================================================================================================================================================
