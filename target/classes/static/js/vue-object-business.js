@@ -199,6 +199,22 @@ var vueObjectBusinessTabs = new Vue({
             } else if (this.myObjects.FFFFFFFFFFFFFFFFObj.choose == 1) {
                 alert("cookie代码未实现");
             }
+        },
+        InsertTableParam(index) {
+            // console.log("index=" + index);
+            var temp = {
+                COLUMN_COMMENT: "说明插入成功",
+                COLUMN_NAME: "说明插入成功",
+                FINAL_COLUMN_NAME: "说明插入成功",
+                TABLE_NAME: "说明插入成功",
+                index: 99999
+            };
+            console.log(this.tableFieldData);
+            var b = this.newData;
+            b.splice(2, 0, temp);
+            console.log(b);
+            this.tableFieldData = b;
+            this.$forceUpdate();
         }
     }
 });
@@ -252,6 +268,15 @@ var CarouselWithAlertObj = new Vue({
 });
 
 //============================================================================================================================================================================
+var textingObj = new Vue({
+    el: '#texting', methods: {
+        getCookie: function () {
+            console.log(localStorageController('get', 'tableDataInLocalStorage'));
+        }
+    }
+});
+
+//============================================================================================================================================================================
 /**
  * 将手动拓展后的表格数据按照顺序重新封装成Vue数据，然后更新之。
  * ElementUI和sortables.js不互动，所以要自己手动更新数据。
@@ -279,14 +304,12 @@ function updateTableFieldData() {
             COLUMN_NAME: _COLUMN_NAME,
             FINAL_COLUMN_NAME: _FINAL_COLUMN_NAME
         });
-        // console.log(FINAL_COLUMN_NAME);
-        // var nextTemp = temp.getElementsByTagName("div")[0].getElementsByTagName("div")[0];
-        // nextTemp.innerHTML = index + 1;//注意是等于号，不是方法
     })
     // console.log(newData);//循环结束后，查看结果，检查通过
     //将新的类别数据给到
     vueObjectBusinessTabs.newData = tempNewData;
-    $
+    localStorageController('set', 'tableDataInLocalStorage', JSON.stringify(tempNewData));//存localStorage
+
 }
 
 //============================================================================================================================================================================

@@ -22,6 +22,8 @@ function testConnection() {
         data: {},
         dataType: 'json',
         timeout: 5000,
+        beforeSend: function () {
+        },
         success: function (data) {
             fillSelectDocker(data.data);//将获取的数据填充到Vue对象，使得select组件填充数据
             vueObjectMainDrawer.myObjects.systemMessage.status = '已连接';
@@ -31,6 +33,7 @@ function testConnection() {
             setTimeout(function () {
                 notificationBusiness.businessOpenNotification({title: '消息', message: data.message, offset: 100, duration: 0, position: 'top-right'});
             }, 500);
+            vueObjectMainDrawer.myObjects.imgSrc = 'static/img/cat-day-innocent.png';
         },
         complete: function (XMLHttpRequest, status) { //当请求完成时调用函数
             vueObjectMainDrawer.myObjects.systemMessage.showSystemStatus = true;
@@ -99,3 +102,6 @@ function getCurrentSystemDateTime() {
 }
 
 // ==================================================
+
+// ==================================================
+

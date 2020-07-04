@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="../static/css/main-business.css">
 <script src="../static/js/event-business.js"></script>
 <script src="../static/js/animate-business.js"></script>
+<script src="../static/js/functionsGlobal.js"></script>
 <!--custom css/js End-->
 </head>
 <body>
@@ -97,8 +98,8 @@
                             <el-dropdown split-button type="primary" @command="FFFFFFFFFFFFFFFF" @click="FFFFFFFFFFFFFFFFLoad">
                                 {{myObjects.FFFFFFFFFFFFFFFFObj.msg}}
                                 <el-dropdown-menu slot="dropdown">
-                                    <el-dropdown-item command="0">数据库实时</el-dropdown-item>
-                                    <el-dropdown-item command="1">cookie</el-dropdown-item>
+                                    <el-dropdown-item command="0">1-数据库实时加载</el-dropdown-item>
+                                    <el-dropdown-item command="1">2-LocalStorage加载</el-dropdown-item>
                                 </el-dropdown-menu>
                             </el-dropdown>
                         </div>
@@ -172,15 +173,8 @@
                                 </el-table-column>
                                 <el-table-column prop="_operation_" label="操作" width="300">
                                     <template slot-scope="scope">
-                                        <el-button
-                                                size="mini"
-                                                @click="handleEdit(scope.$index, scope.row)">编辑
-                                        </el-button>
-                                        <el-button
-                                                size="mini"
-                                                type="danger"
-                                                @click="handleDelete(scope.$index, scope.row)">删除
-                                        </el-button>
+                                        <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                                        <el-button size="mini" type="danger">删除</el-button>
                                     </template>
                                 </el-table-column>
                             </el-table>
@@ -189,6 +183,7 @@
                     <el-col :span="1">
                         <div>
                             <el-button size="mini" @click="loadTableFields">加载</el-button>
+                            <el-button size="mini" @click="InsertTableParam(1)">插入</el-button>
                         </div>
                     </el-col>
                 </el-row>
@@ -210,6 +205,7 @@
 <div>
     <!--这是一个loading组件-->
 </div>
+<div id="texting"></div>
 </body>
 <!-------------------------------------------------------------------------------------------------------------------------------->
 <script type="text/template" id="">
