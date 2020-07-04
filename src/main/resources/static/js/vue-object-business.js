@@ -1,8 +1,6 @@
 //============================================================================================================================================================================
 new Vue({el: '#business-divider-top'});//一个顶部的切割线组件
 new Vue({el: '#backToTop', data: {vhHeight: 15}});//一个回到顶部的组件
-new Vue({el: '#asdasdasdasdadas', data: {vhHeight: 15}});//一个回到顶部的组件
-
 //============================================================================================================================================================================
 /**
  *主抽屉组件：左侧边栏组件
@@ -20,7 +18,7 @@ var vueObjectMainDrawer = new Vue({
         //我的自定义属性对象
         myObjects: {
             imgSrc: 'static/img/cat-day.png',// 头像地址
-            systemMessage: {status: '未连接....', time: ''}
+            systemMessage: {status: '未连接....', time: '', showLoadingDataBase: true, showSystemStatus: false}
         }
     }
 });
@@ -70,20 +68,19 @@ var vueObjectSteps = new Vue({
  */
 var vueObjectBusinessTabs = new Vue({
     el: '#business-tabs',
-    data() {
-        return {
-            // tabs组件部分
-            activeName: 'first',
-            stretch: true,
-            // select组件部分
-            selectDataTableNames: [],
-            selectArray: '',
-            msgStatus: 0,
-            //table表格部分
-            tableFieldData: [],
-            //存放其他自定义的信息
-            myObjects: {myCurrentTime: ''}
-        };
+    data: {
+        // tabs组件部分
+        activeName: 'first',
+        stretch: true,
+        // select组件部分
+        selectDataTableNames: [],
+        selectArray: '',
+        msgStatus: 0,
+        //table表格部分
+        tableFieldData: [],
+        newData: [],//列表变动之后的新数据集合
+        //存放其他自定义的信息
+        myObjects: {myCurrentTime: '', FFFFFFFFFFFFFFFFObj: {msg: '请选择数据源', choose: -1}}
     },
     methods: {
         // tabs方法
@@ -156,10 +153,11 @@ var vueObjectBusinessTabs = new Vue({
          * 加载表的全部字段
          */
         loadTableFields() {
+            // console.log('cookie=' + $.cookie('cckk'));
             let tables = this.selectArray;
             if (tables.length == 0) {
                 this.$message({
-                    message: '请选择只是一张表格',
+                    message: '请选择至少一张表格',
                     type: 'warning'
                 });
                 return false;
@@ -181,7 +179,26 @@ var vueObjectBusinessTabs = new Vue({
 
                 }
             });
-
+        },
+        /**
+         *选择数据源：选择下拉按钮的选项时触发的回调函数
+         * @constructor
+         */
+        FFFFFFFFFFFFFFFF(command) {
+            if (command == 0) {
+                this.myObjects.FFFFFFFFFFFFFFFFObj.msg = '点击从数据库实时加载';
+                this.myObjects.FFFFFFFFFFFFFFFFObj.choose = command;
+            } else if (command == 1) {
+                this.myObjects.FFFFFFFFFFFFFFFFObj.msg = '点击从cookie加载';
+                this.myObjects.FFFFFFFFFFFFFFFFObj.choose = command;
+            }
+        },
+        FFFFFFFFFFFFFFFFLoad() {
+            if (this.myObjects.FFFFFFFFFFFFFFFFObj.choose == 0) {
+                testConnection();
+            } else if (this.myObjects.FFFFFFFFFFFFFFFFObj.choose == 1) {
+                alert("cookie代码未实现");
+            }
         }
     }
 });
@@ -192,7 +209,7 @@ var vueObjectBusinessTabs = new Vue({
  */
 
 /**
- * 给列表元素添加可拓展插件支持
+ * 给列表元素添加可拓展插件【Sortable.js】的支持
  */
 function bulidSortableAfterGetData() {
     // ==================================================
@@ -214,6 +231,8 @@ function bulidSortableAfterGetData() {
                 var nextTemp = temp.getElementsByTagName("div")[0].getElementsByTagName("div")[0];
                 nextTemp.innerHTML = index + 1;//注意是等于号，不是方法
             })
+            //完成之后刷新Vue对象数据
+            updateTableFieldData();
         }
     });
 }
@@ -223,6 +242,7 @@ var CarouselWithAlertObj = new Vue({
     el: '#CarouselWithAlert',
     data: {
         showCarouselWithAlert: true,
+        intervalTime: 5000,
         helpMessages: [
             {title: '选择表格', type: 'success', description: '表格加载完成后，点击下拉框选择表格，所选表格将加载其全部字段'},
             {title: '下拉框支持功能', type: 'warning', description: '当前选择框支持以下功能：多选、可搜索、清空'},
@@ -230,4 +250,43 @@ var CarouselWithAlertObj = new Vue({
         ]
     }
 });
+
+//============================================================================================================================================================================
+/**
+ * 将手动拓展后的表格数据按照顺序重新封装成Vue数据，然后更新之。
+ * ElementUI和sortables.js不互动，所以要自己手动更新数据。
+ */
+function updateTableFieldData() {
+    var tempNewData = [];
+    var tableTbody = $(".tableDocker tbody:first>tr");//tr对象数组
+    $.each(tableTbody, function (index, domElement) {
+        var td_0 = domElement.getElementsByTagName("td")[0];//拿到第1个td
+        var td_1 = domElement.getElementsByTagName("td")[1];//拿到第2个td
+        var td_2 = domElement.getElementsByTagName("td")[2];//拿到第3个td
+        var td_3 = domElement.getElementsByTagName("td")[3];//拿到第4个td
+        var td_4 = domElement.getElementsByTagName("td")[4];//拿到第5个td
+        //从第一列获取序号
+        var _index = td_0.getElementsByTagName("div")[0].getElementsByTagName("div")[0].innerHTML;
+        var _TABLE_NAME = td_1.getElementsByTagName("div")[0].innerHTML;
+        var _COLUMN_COMMENT = $(td_2).find("span[class*='el-tag']")[0].innerText;//$(js对象)是将js对象转jQuery对象；find()是找后代元素，children()是找子元素，“*=”是指包含；jquery除了get()得到是jQuery对象之外，其他find()等方法得到都是js对象
+        var _COLUMN_NAME = $(td_3).find("div[class='cell']")[0].innerHTML;
+        var _FINAL_COLUMN_NAME = $($(td_4).find("div[class='el-input']")[0]).find("input[class=el-input__inner]")[0].value;
+        // 都获取之后拼装json数组
+        tempNewData.push({
+            index: _index - 1,//因为页面是序号
+            TABLE_NAME: _TABLE_NAME,
+            COLUMN_COMMENT: _COLUMN_COMMENT,
+            COLUMN_NAME: _COLUMN_NAME,
+            FINAL_COLUMN_NAME: _FINAL_COLUMN_NAME
+        });
+        // console.log(FINAL_COLUMN_NAME);
+        // var nextTemp = temp.getElementsByTagName("div")[0].getElementsByTagName("div")[0];
+        // nextTemp.innerHTML = index + 1;//注意是等于号，不是方法
+    })
+    // console.log(newData);//循环结束后，查看结果，检查通过
+    //将新的类别数据给到
+    vueObjectBusinessTabs.newData = tempNewData;
+    $
+}
+
 //============================================================================================================================================================================

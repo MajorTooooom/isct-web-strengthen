@@ -3,6 +3,7 @@
  */
 
 $(function () {
+    // $.cookie('cckk', '读取cookie成功', {expires: 1});
     notificationBusiness.businessOpenNotification({title: '正在测试连接状态', message: 'waiting..........', offset: 100, duration: 0, position: 'bottom-right'});
     testConnection();
 });
@@ -12,6 +13,8 @@ $(function () {
  *页面加载时读取一次数据库表信息
  */
 function testConnection() {
+    vueObjectMainDrawer.myObjects.systemMessage.showLoadingDataBase = true;
+    vueObjectMainDrawer.myObjects.systemMessage.showSystemStatus = false;
     var ajaxTimeOut = $.ajax({
         url: '/startTimeTest',
         type: 'post',
@@ -22,7 +25,7 @@ function testConnection() {
         success: function (data) {
             fillSelectDocker(data.data);//将获取的数据填充到Vue对象，使得select组件填充数据
             vueObjectMainDrawer.myObjects.systemMessage.status = '已连接';
-            vueObjectMainDrawer.myObjects.systemMessage.time = getCurrentSystemDateTime();
+            vueObjectBusinessTabs.myObjects.FFFFFFFFFFFFFFFFObj.msg = '已加载表格' + data.data.length + '张';
             setTimeout(function () {
             }, 300);
             setTimeout(function () {
@@ -30,6 +33,9 @@ function testConnection() {
             }, 500);
         },
         complete: function (XMLHttpRequest, status) { //当请求完成时调用函数
+            vueObjectMainDrawer.myObjects.systemMessage.showSystemStatus = true;
+            vueObjectMainDrawer.myObjects.systemMessage.showLoadingDataBase = false;
+            vueObjectMainDrawer.myObjects.systemMessage.time = getCurrentSystemDateTime();
             //status == 'timeout'，超时,status的可能取值：success,notmodified,nocontent,error,timeout,abort,parsererror
             if (status == 'timeout') {
                 //取消请求

@@ -5,6 +5,7 @@
 <title>never work overtime</title>
 <!--框架 Start-->
 <script src="../static/framework/jquery/jquery-3.5.1.js"></script>
+<script src="../static/framework/jquery/jquery.cookie.js"></script>
 <script src="../static/framework/vue/vue.js"></script>
 <script src="../static/framework/element-ui-2.13.2/lib/index.js"></script>
 <script src="../static/framework/sortable/Sortable.min.js"></script>
@@ -19,56 +20,71 @@
 <!--custom css/js End-->
 </head>
 <body>
+<!--页首分割线-->
 <div id="business-divider-top">
     <el-divider content-position="center">
         <i class="fa fa-clone" aria-hidden="true"></i>
     </el-divider>
 </div>
+<!--抽屉层组件-->
 <div id="vue-main-drawer">
     <div class="menu-style">
         <el-button @click="drawer = true" style="margin-left: 16px;" type="primary" plain :icon="icon">MENU</el-button>
     </div>
     <!--抽屉里面的内容必须放在标签内-->
     <el-drawer :visible.sync="drawer" :direction="direction" :withHeader="false" :size="size" :show-close="false">
-        <div class="text-align">
-            <div class="backToIndex-2" style="text-align: center !important;">
-                <el-avatar :size="100" class="shake shake-hard" :src="myObjects.imgSrc"></el-avatar>
-            </div>
+        <div v-if="myObjects.systemMessage.showLoadingDataBase">
+            <el-row>
+                <el-col :span="24">
+                    <div class="grid-content bg-purple-dark" :class="{textAlign:true}">
+                        <i class="fa fa-spinner fa-spin fa-3x"><!--通过font-awesome图标来表示加载状态--></i>&nbsp;Loading....
+                    </div>
+                </el-col>
+            </el-row>
         </div>
-        <el-row>
-            <el-col :span="24">
-                <div class="grid-content bg-purple-dark" :class="{textAlign:true}">
-                    当前系统状态：{{myObjects.systemMessage.status}}
+        <div v-if="myObjects.systemMessage.showSystemStatus">
+            <div class="text-align">
+                <div class="backToIndex-2" style="text-align: center !important;">
+                    <el-avatar :size="100" class="shake shake-hard" :src="myObjects.imgSrc"><!--头像--></el-avatar>
                 </div>
-            </el-col>
-            <el-col :span="24">
-                <div class="grid-content bg-purple-dark" :class="{textAlign:true}">
-                    最后测试时间：{{myObjects.systemMessage.time}}
-                </div>
-            </el-col>
-        </el-row>
+            </div>
+            <el-row>
+                <el-col :span="24">
+                    <div class="grid-content bg-purple-dark" :class="{textAlign:true}">
+                        当前系统状态：{{myObjects.systemMessage.status}}
+                    </div>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="24">
+                    <div class="grid-content bg-purple-dark" :class="{textAlign:true}">
+                        最后测试时间：{{myObjects.systemMessage.time}}
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
     </el-drawer>
 </div>
-<!--<div style="height: 60px"></div>-->
+<!--步骤层组件-->
 <div id="business-steps">
     <el-steps :active="curActive" align-center>
         <el-step title="步骤1" description="选择数据"></el-step>
-        <el-step title="步骤2" description=""></el-step>
-        <el-step title="步骤3" description=""></el-step>
-        <el-step title="步骤4" description=""></el-step>
+        <el-step title="步骤2" description="选择字段"></el-step>
+        <el-step title="步骤3" description="预览"></el-step>
+        <el-step title="步骤4" description="功能"></el-step>
     </el-steps>
 </div>
-<!--alert提醒区，利用的树跑马灯组件Carousel-->
+<!--在tabs标签页之前的alert提醒区，利用的是跑马灯组件Carousel-->
 <div id="CarouselWithAlert" :class="{textAlign:true}" v-if="showCarouselWithAlert">
     <div style="width: 50%;display: inline-block">
-        <el-carousel height="50px" direction="vertical" :autoplay="true" interval="5000">
+        <el-carousel height="50px" direction="vertical" :autoplay="true" :interval="intervalTime">
             <el-carousel-item v-for="(Myitem,Myiniex) in helpMessages" :key="Myiniex" :class="{textLeft:true}">
                 <el-alert :title="Myitem.title" :type="Myitem.type" :description="Myitem.description" show-icon></el-alert>
             </el-carousel-item>
         </el-carousel>
     </div>
 </div>
-<!--<div id="business-tabs"></div>是主要的信息展示区-->
+<!--标签页tabs是主要的信息展示区，其下包含了大量的组件-->
 <div id="business-tabs">
     <el-tabs v-model="activeName" @tab-click="handleClick" tab-position="left">
         <el-tab-pane label="选择表格" name="first">
@@ -77,13 +93,19 @@
                 <el-row>
                     <el-col :span="6" v-bind:class="{vueClassTabBaneCol:true}">
                         <div class="text-align">
+                            <!--下拉列表组件：已加载表格XXX张-->
+                            <el-dropdown split-button type="primary" @command="FFFFFFFFFFFFFFFF" @click="FFFFFFFFFFFFFFFFLoad">
+                                {{myObjects.FFFFFFFFFFFFFFFFObj.msg}}
+                                <el-dropdown-menu slot="dropdown">
+                                    <el-dropdown-item command="0">数据库实时</el-dropdown-item>
+                                    <el-dropdown-item command="1">cookie</el-dropdown-item>
+                                </el-dropdown-menu>
+                            </el-dropdown>
+                        </div>
+                        <p style="height: 15px"></p>
+                        <div class="textAlign">
                             <div class="selectSummit">
                                 <el-button type="success" plain @click="selectSummit"><i class="fa fa-check-square" aria-hidden="false"></i>&nbsp;使用所选</el-button>
-                            </div>
-                        </div>
-                        <div class="text-align">
-                            <div class="selectSummit">
-                                <el-button type="success" plain @click="selectSummit"><i class="fa fa-check-square" aria-hidden="false"></i>&nbsp;清空所选</el-button>
                             </div>
                         </div>
                     </el-col>
@@ -107,9 +129,69 @@
                 </el-row>
             </div>
         </el-tab-pane>
+        <!--<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<-->
         <el-tab-pane label="选择字段" name="second">
             <div class="tabContext">
-
+                <el-row>
+                    <el-col :span="24" v-bind:style="{height:'10px'}"></el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="23">
+                        <div class="tableDocker">
+                            <el-table :data="tableFieldData" style="width: 100%" :row-class-name="tableRowClassName" stripe>
+                                <el-table-column type="index" label="sort" width="50"></el-table-column>
+                                <el-table-column prop="TABLE_NAME" label="表名" width="250"></el-table-column>
+                                <el-table-column prop="COLUMN_COMMENT" label="字段描述" width="180">
+                                    <template slot-scope="scope">
+                                        <el-popover trigger="hover" placement="top">
+                                            <!--p标签内容是tag的内容-->
+                                            <p>字段描述: {{ scope.row.COLUMN_COMMENT }}</p>
+                                            <p>字段类型: {{ scope.row.COLUMN_TYPE }}</p>
+                                            <p>表名: {{ scope.row.TABLE_NAME }}</p>
+                                            <p>字段名: {{ scope.row.COLUMN_NAME }}</p>
+                                            <!--slot内容是表格内内容-->
+                                            <div slot="reference" class="name-wrapper">
+                                                <el-tag size="medium">{{ scope.row.COLUMN_COMMENT }}</el-tag>
+                                            </div>
+                                        </el-popover>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="COLUMN_NAME" label="字段名" width="250"></el-table-column>
+                                <el-table-column prop="_" label="最终字段" width="250">
+                                    <!--↑↑列的内容不载是值，而是套了一个输入框，输入框的值和tableData的属性FINAL_COLUMN_NAME绑定-->
+                                    <template slot="header" slot-scope="scope">
+                                        <div class="top">
+                                            <el-tooltip class="item" effect="dark" content="请注意！考虑到有时候数据库的字段并非我们想要的字段，此列的值是最终期望值" placement="top-start">
+                                                <span>最终使用字段(<i class="fa fa-exclamation" aria-hidden="true"></i>)</span>
+                                            </el-tooltip>
+                                        </div>
+                                    </template>
+                                    <template slot-scope="scope">
+                                        <el-input v-model="scope.row.FINAL_COLUMN_NAME"></el-input>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column prop="_operation_" label="操作" width="300">
+                                    <template slot-scope="scope">
+                                        <el-button
+                                                size="mini"
+                                                @click="handleEdit(scope.$index, scope.row)">编辑
+                                        </el-button>
+                                        <el-button
+                                                size="mini"
+                                                type="danger"
+                                                @click="handleDelete(scope.$index, scope.row)">删除
+                                        </el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                    </el-col>
+                    <el-col :span="1">
+                        <div>
+                            <el-button size="mini" @click="loadTableFields">加载</el-button>
+                        </div>
+                    </el-col>
+                </el-row>
             </div>
         </el-tab-pane>
         <el-tab-pane label="角色管理" name="third">
@@ -121,13 +203,16 @@
     </el-tabs>
 </div>
 <div id="notificationBusiness"><!--这是一个消息提示组件--></div>
+<!--这是一个回到顶部组件-->
 <div id="backToTop">
     <el-backtop :visibility-height="vhHeight"></el-backtop>
+</div>
+<div>
+    <!--这是一个loading组件-->
 </div>
 </body>
 <!-------------------------------------------------------------------------------------------------------------------------------->
 <script type="text/template" id="">
-
 </script>
 <!-------------------------------------------------------------------------------------------------------------------------------->
 <!--custom css/js Start 需要放在<script type="text/template"</script>的后面，因为要用它里面的代码-->
