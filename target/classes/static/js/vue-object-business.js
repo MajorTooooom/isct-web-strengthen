@@ -149,6 +149,7 @@ var vueObjectBusinessTabs = new Vue({
                 });
                 CarouselWithAlertObj.showCarouselWithAlert = false;//联动
                 vueObjectSteps.curActive = 1;//步骤组件也切换
+                myLayer('.locationCs', {message: '点击加载数据', tips: 2, setTimeout: true, time: 1000})
             }
         },
         /**
@@ -190,7 +191,7 @@ var vueObjectBusinessTabs = new Vue({
                     vueObjectBusinessTabs.tableFieldData = data.data;//原始数据份
                     vueObjectBusinessTabs.newData = data.data;//首次也要加载动态份
                     vueObjectBusinessTabs.globalForceUpdate();
-                    bulidSortableAfterGetData();//对表格做可拓展的增强处理
+                    bulidSortableAfterGetData();//对表格做可拖拽的增强处理即添加sortable.js
                 },
                 complement: function () {
 
@@ -237,7 +238,7 @@ var vueObjectBusinessTabs = new Vue({
             this.newData.splice(index, 1);//强无敌,注意：一旦调用了splice()方法就已经改变其本身了。意思是在index的位置删除一个元素
             this.newData.splice(0, 0, temp);//在index=0的位置删除0个元素并添加一个元素temp
             this.$forceUpdate();//Vue强制刷新组件，解决页面不刷新的问题，而且不用自己更像index
-            this.updateTableFieldData();//更新finalTableData[]
+            // this.updateTableFieldData();//更新finalTableData[]
         },
         /**
          * 删除一行
@@ -248,7 +249,7 @@ var vueObjectBusinessTabs = new Vue({
         deleteOneJson(index, row, column) {
             this.newData.splice(index, 1);
             this.$forceUpdate();//Vue强制刷新组件，解决页面不刷新的问题，而且不用自己更像index
-            this.updateTableFieldData();//更新finalTableData[]
+            // this.updateTableFieldData();//更新finalTableData[]
         },
         /**
          * 表格组件的方法：在当前选择的行的前面插入一条数据
@@ -285,7 +286,7 @@ var vueObjectBusinessTabs = new Vue({
             this.TableDialog.dialogFormVisible = false;
             this.newData.splice(insertIndex, 0, temp);//强无敌,注意：一旦调用了splice()方法就已经改变其本身了
             this.$forceUpdate();//Vue强制刷新组件，解决页面不刷新的问题，而且不用自己更像index
-            this.updateTableFieldData();//更新finalTableData[]
+            // this.updateTableFieldData();//更新finalTableData[]
         },
         /**
          * 将手动拓展后的表格数据按照顺序重新封装成Vue数据，然后更新之。
@@ -329,9 +330,7 @@ var vueObjectBusinessTabs = new Vue({
             // console.log(tempNewData);//循环结束后，查看结果，检查通过
             //将新的类别数据给到
             // vueObjectBusinessTabs.newData = tempNewData;
-            /*************************************************************【目标】/
-             this.finalTableData = tempNewData;
-             /*************************************************************/
+            vueObjectBusinessTabs.finalTableData = tempNewData;
             // console.log(this.newData);
             // console.log(this.finalTableData);
             // this.$forceUpdate();//Vue强制刷新组件，解决页面不刷新的问题
@@ -375,7 +374,7 @@ function bulidSortableAfterGetData() {
                 nextTemp.innerHTML = index + 1;//注意是等于号，不是方法
             })
             //完成之后更新数据
-            vueObjectBusinessTabs.updateTableFieldData();//实际是调成功的了
+            // vueObjectBusinessTabs.updateTableFieldData();//实际是调成功的了；20200705124630：决定此数据在提交的时候再更新
         }
     });
 }

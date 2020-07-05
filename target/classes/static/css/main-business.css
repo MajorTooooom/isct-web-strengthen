@@ -73,3 +73,11 @@ li {
 .myBackgroundColor {
     background-color: red;
 }
+
+.TableDashboard {
+    min-height: 200px;
+    border-radius: 6px;
+    border: #0e4980 2px solid;
+    margin-right: 15px;
+    text-align: center;
+}

@@ -17,3 +17,20 @@ function localStorageController(type, key, value) {
         return 1;
     }
 }
+
+function myLayer(IdOrClass, options) {
+    layui.use('layer', function () {
+        var myGlobalLayer = layui.layer;
+        if (options.setTimeout == true) {
+            setTimeout(function () {
+                unifiedLayerAction(myGlobalLayer, IdOrClass, options);
+            }, options.time);
+        } else {
+            unifiedLayerAction(myGlobalLayer, IdOrClass, options);
+        }
+    });
+}
+
+function unifiedLayerAction(myGlobalLayer, IdOrClass, options) {
+    myGlobalLayer.tips(options.message, IdOrClass, {tips: options.tips == undefined || options.tips == '' ? 2 : options.tips});
+}

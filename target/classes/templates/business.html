@@ -9,9 +9,11 @@
 <script src="../static/framework/vue/vue.js"></script>
 <script src="../static/framework/element-ui-2.13.2/lib/index.js"></script>
 <script src="../static/framework/sortable/Sortable.min.js"></script>
+<script src="../static/framework/layui/layui.js"></script>
 <link rel="stylesheet" href="../static/framework/csshake/csshake.css">
 <link rel="stylesheet" href="../static/framework/font-awesome-4.7.0/css/font-awesome.css">
 <link rel="stylesheet" href="../static/framework/element-ui-2.13.2/lib/theme-chalk/index.css">
+<link rel="stylesheet" href="../static/framework/layui/css/layui.css">
 <!--框架 End-->
 <!--custom css/js Start-->
 <link rel="stylesheet" href="../static/css/main-business.css">
@@ -138,14 +140,24 @@
                 </el-row>
                 <el-row>
                     <el-col :span="3">
-                        <el-tooltip class="item" effect="dark" content="根据选定的表格从数据库加载" placement="top">
-                            <el-button @click="loadTableFields">
-                                <span>加载</span>
-                            </el-button>
-                        </el-tooltip>
+                        <div :class="{TableDashboard:true}">
+                            <el-card class="box-card" shadow="hover">
+                                <div slot="header" class="clearfix">
+                                    <span>DashBoard</span>
+                                    <el-tooltip class="item" effect="dark" content="根据选定的表格从数据库加载" placement="top">
+                                        <el-button @click="loadTableFields" :class="{locationCs:true}">
+                                            <span>加载</span>
+                                        </el-button>
+                                    </el-tooltip>
+                                </div>
+                                <p class="item">已选表格:&nbsp;{{selectArray.length}}&nbsp;张</p>
+                                <p class="item">已选:&nbsp;{{newData.length}}&nbsp;个</p>
+                                <p class="item">已选:&nbsp;{{finalTableData.length}}&nbsp;个</p>
+                            </el-card>
+                        </div>
                     </el-col>
                     <el-col :span="21">
-                        <div class="tableDocker">
+                        <div class="tableDocker TableDashboard">
                             <el-table :data="newData" style="width: 100%" :row-class-name="tableRowClassName" stripe>
                                 <el-table-column type="index" label="sort" width="50"></el-table-column>
                                 <el-table-column prop="TABLE_NAME" label="表名" width="250"></el-table-column>
