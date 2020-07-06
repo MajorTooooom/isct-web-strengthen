@@ -23,10 +23,11 @@ li {
 
 #business-tabs .tabContext {
     min-height: 450px;
-    /*background-color: #8f9995;*/
-    border: #2f34ff 2px solid;
-    border-radius: 6px;
+    /*background-color: #fafac2;*/
+    border: #9ba5ff 2px solid;
+    border-radius: 4px;
     margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 
@@ -77,8 +78,8 @@ li {
 
 .TableDashboard {
     min-height: 200px;
-    border-radius: 6px;
-    border: #0e4980 2px solid;
+    border-radius: 4px;
+    border: #faad77 2px solid;
     margin-right: 15px;
     text-align: center;
 }

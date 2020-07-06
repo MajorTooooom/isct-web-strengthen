@@ -47,11 +47,14 @@ public class StringbufferTableFieldsServiceImpl implements StringbufferTableFiel
             return forMoreCode_timeWithEnd(options);
         } else if (type.equals("dropDownBox")) {
             return forMoreCode_dropDownBox(options);
+        } else if (type.equals("dropDownBox_other")) {
+            return forMoreCode_dropDownBox_other(options);
         }
 
 
         return null;
     }
+
 
     /**
      * 加载字典表，安装ElementUI的数据格式封装
@@ -311,6 +314,23 @@ public class StringbufferTableFieldsServiceImpl implements StringbufferTableFiel
                 "    <label class=\"col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label\">".replaceAll("4", width_2) + COLUMN_COMMENT + ":</label>\n" +
                 "    <div class=\"col-xs-8 col-sm-8 col-md-8 col-lg-8\">\n".replaceAll("8", width_3) +
                 "        <select class=\"form-control\" name=\"" + HumpUtils.dealHump(COLUMN_NAME) + "\" data-dtype=\"" + fatherID + "\" value=\"" + childID + "\"></select>\n" +
+                "    </div>\n" +
+                "</div>";
+        return s;
+    }
+
+    private String forMoreCode_dropDownBox_other(Map<String, Object> options) {
+        String type = options.get("type") == null ? "" : options.get("type").toString();
+        String COLUMN_COMMENT = options.get("COLUMN_COMMENT") == null ? "" : options.get("COLUMN_COMMENT").toString();
+        String COLUMN_NAME = options.get("COLUMN_NAME") == null ? "" : options.get("COLUMN_NAME").toString();
+        String width_1 = options.get("width_1") == null ? "" : options.get("width_1").toString();
+        String width_2 = options.get("width_2") == null ? "" : options.get("width_2").toString();
+        String width_3 = options.get("width_3") == null ? "" : options.get("width_3").toString();
+        String currentChooseDictionary = options.get("currentChooseDictionary") == null ? "" : options.get("currentChooseDictionary").toString();
+        String s = "<div class='col-xs-4 col-sm-4 col-md-4 col-lg-4'>\n".replaceAll("4", width_1) +
+                "    <label class=\"col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label\">".replaceAll("4", width_2) + COLUMN_COMMENT + ":</label>\n" +
+                "    <div class=\"col-xs-8 col-sm-8 col-md-8 col-lg-8\">\n".replaceAll("8", width_3) +
+                "        <select class=\"form-control\" name=\""+HumpUtils.dealHump(COLUMN_NAME)+"\" data-otype=\"请手动输入你的数据\"></select>\n" +
                 "    </div>\n" +
                 "</div>";
         return s;

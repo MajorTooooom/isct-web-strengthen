@@ -363,6 +363,13 @@
                         <el-button size="mini" icon="fa-tv fa" @click="currentFieldFunctionZone.innerVisible=true"></el-button>
                     </el-button-group>
                 </div>
+                <div>
+                    <el-button-group>
+                        <el-button size="mini" icon="el-icon-full-screen" @click="moreFunction('dropDownBox_other')">下拉单选框（非字典表）</el-button>
+                        <el-button size="mini" icon="fa-tv fa" @click="currentFieldFunctionZone.innerVisible=true"></el-button>
+                        <span>&nbsp;&nbsp;&nbsp;请手动输入data-otype的值</span>
+                    </el-button-group>
+                </div>
             </div>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="currentFieldFunctionZone.centerDialogVisible = false" size="mini">取 消</el-button>
