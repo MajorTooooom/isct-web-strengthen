@@ -75,6 +75,7 @@ let vueObjectBusinessTabs = new Vue({
         // select组件部分
         selectDataTableNames: [],
         selectArray: '',//其length也经常被调用
+        fullscreenLoading: false,
         msgStatus: 0,
         //table表格部分,tableFieldData主要是用于储存从数据库加载的原始备份，后面在页面无论对于表格怎么操作，都不要影响这个数据
         tableFieldData: [],
@@ -198,6 +199,7 @@ let vueObjectBusinessTabs = new Vue({
                 beforeSend: function () {
                     vueObjectBusinessTabs.tableFieldData = [];//先清空
                     vueObjectBusinessTabs.newData = [];//先清空
+                    this.fullscreenLoading = true;
                 },
                 success: function (data) {
                     vueObjectBusinessTabs.tableFieldData = data.data;//原始数据份
@@ -207,7 +209,7 @@ let vueObjectBusinessTabs = new Vue({
                     bulidSortableAfterGetData();//对表格做可拖拽的增强处理即添加sortable.js
                 },
                 complement: function () {
-
+                    this.fullscreenLoading = false;
                 }
             });
         },
