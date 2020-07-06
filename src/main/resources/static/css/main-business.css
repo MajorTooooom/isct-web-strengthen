@@ -26,6 +26,7 @@ li {
     /*background-color: #8f9995;*/
     border: #2f34ff 2px solid;
     border-radius: 6px;
+    margin-right: 10px;
 }
 
 
@@ -80,4 +81,49 @@ li {
     border: #0e4980 2px solid;
     margin-right: 15px;
     text-align: center;
+}
+
+
+.functionBtnsForTables {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    min-height: 400px;
+    border-radius: 6px;
+    border: #0e4980 2px solid;
+    margin-right: 15px;
+    text-align: center;
+}
+
+.functionBtnsForTables > div {
+    margin-top: 10px;
+}
+
+#foot {
+    height: 50px;
+}
+
+
+.colNameValClass {
+    min-height: 350px;
+    width: 100%;
+    border: 0px;
+}
+
+
+.moreFunctionBtnC > div, .moreFunctionBtnC {
+    margin-top: 25px;
+
+}
+
+.indialog {
+    min-height: 350px;
+    width: 100%;
+}
+
+.inlinkblockInput {
+    width: 75%;
+}
+
+#htmlCode{
+    border: 0px;
 }

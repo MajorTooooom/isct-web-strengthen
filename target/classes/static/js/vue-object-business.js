@@ -7,7 +7,7 @@ new Vue({el: '#backToTop', data: {vhHeight: 15}});//一个回到顶部的组件
  * 含组件,组件的属性放到一起
  * @type {Vue}
  */
-var vueObjectMainDrawer = new Vue({
+let vueObjectMainDrawer = new Vue({
     el: "#vue-main-drawer",
     data: {
         drawer: true,
@@ -27,7 +27,7 @@ var vueObjectMainDrawer = new Vue({
  * notification消息提醒组件
  * @type {Vue}
  */
-var notificationBusiness = new Vue({
+let notificationBusiness = new Vue({
     el: '#notificationBusiness',
     data: {
         // messageGroup: {}
@@ -52,7 +52,7 @@ var notificationBusiness = new Vue({
  * 步骤条组件
  * @type {Vue}
  */
-var vueObjectSteps = new Vue({
+let vueObjectSteps = new Vue({
     el: '#business-steps',
     data: {
         // 下标：0~3
@@ -66,7 +66,7 @@ var vueObjectSteps = new Vue({
  * 这个Vue对象下，所以很多data属性值或者方法需要对方在一起，需要结合注释进行区分；
  * @type {Vue}
  */
-var vueObjectBusinessTabs = new Vue({
+let vueObjectBusinessTabs = new Vue({
     el: '#business-tabs',
     data: {
         // tabs组件部分
@@ -74,7 +74,7 @@ var vueObjectBusinessTabs = new Vue({
         stretch: true,
         // select组件部分
         selectDataTableNames: [],
-        selectArray: '',
+        selectArray: '',//其length也经常被调用
         msgStatus: 0,
         //table表格部分,tableFieldData主要是用于储存从数据库加载的原始备份，后面在页面无论对于表格怎么操作，都不要影响这个数据
         tableFieldData: [],
@@ -91,10 +91,21 @@ var vueObjectBusinessTabs = new Vue({
                 COLUMN_NAME: ''
             },
             dialogFormVisible: false,//初始化不可见
-
+        },
+        // InputNumber计数器组件数据
+        InputNumberParams: {fewNum: 0},
+        //表格按钮的dialog
+        currentFieldFunctionZone: {
+            currentChooseDictionary: '', bscDictionaryInfoTree: [], centerDialogVisible: false, innerVisible: false, index: -1, row: {}, column: {}, width_1: 3, width_2: 4, width_3: 8, currentShowData: ''
         },
         //存放其他自定义的信息
-        myObjects: {myCurrentTime: '', FFFFFFFFFFFFFFFFObj: {msg: '请选择数据源', choose: -1}}
+        myObjects: {
+            myCurrentTime: '',
+            FFFFFFFFFFFFFFFFObj: {msg: '请选择数据源', choose: -1},
+            dealBusiness: {
+                getColNames: {doing: false, percentage: 0, data: {ColNames: '', colModel: ''}, whatToShow: [], whatToShow_2: '', whatToShow_2_show: true, done: false, url: '/getColNames', dialogShow: false},
+            }
+        }
     },
     methods: {
         // tabs方法
@@ -174,6 +185,7 @@ var vueObjectBusinessTabs = new Vue({
                     message: '请选择至少一张表格',
                     type: 'warning'
                 });
+                myLayer('#tab-first', {message: '请选择至少一张表格', tips: 1});
                 return false;
             }
             $.ajax({
@@ -190,6 +202,7 @@ var vueObjectBusinessTabs = new Vue({
                 success: function (data) {
                     vueObjectBusinessTabs.tableFieldData = data.data;//原始数据份
                     vueObjectBusinessTabs.newData = data.data;//首次也要加载动态份
+                    vueObjectBusinessTabs.InputNumberParams.fewNum = data.data.length;
                     vueObjectBusinessTabs.globalForceUpdate();
                     bulidSortableAfterGetData();//对表格做可拖拽的增强处理即添加sortable.js
                 },
@@ -219,6 +232,36 @@ var vueObjectBusinessTabs = new Vue({
             }
         },
         /**
+         * 展示服务器回来的数据
+         */
+        showAllReturnData(code) {
+            if (code == 99) {
+                this.myObjects.dealBusiness.getColNames.whatToShow_2 = JSON.stringify(this.myObjects.dealBusiness.getColNames.data);
+            } else if (code == 1) {
+                console.log(this.myObjects.dealBusiness.getColNames.data.ColNames);
+                this.myObjects.dealBusiness.getColNames.whatToShow_2 = this.myObjects.dealBusiness.getColNames.data.ColNames;
+            } else if (code == 2) {
+                // console.log(JSON.parse(this.myObjects.dealBusiness.getColNames.data.colModel));
+                this.myObjects.dealBusiness.getColNames.whatToShow_2_show = true;
+                var temp = (JSON.parse(this.myObjects.dealBusiness.getColNames.data.colModel));
+                var string = "";
+                for (let i = 0; i < temp.length; i++) {
+                    var tempItem = temp[i];
+                    string = string + tempItem + "\n";//目的
+                }
+                this.myObjects.dealBusiness.getColNames.whatToShow_2 = string;
+            }
+            // 打开统一展板
+            this.myObjects.dealBusiness.getColNames.dialogShow = true;
+        },
+        /**
+         * 最大化maxedInputNumber计数器的最大值
+         */
+        maxedInputNumberParams() {
+            this.InputNumberParams.fewNum = this.newData.length;
+            myLayer('#locationInputNumber', {tips: 1, message: 'done' + ' max=' + this.newData.length});
+        },
+        /**
          * 指定当前选中的行
          * 也是利用splice()方法，思路是先删除再添加
          * @param index
@@ -227,7 +270,7 @@ var vueObjectBusinessTabs = new Vue({
          */
         topOneJson(index, row, column) {
             // console.log(index);
-            var temp = {
+            let temp = {
                 COLUMN_COMMENT: row.COLUMN_COMMENT,
                 COLUMN_NAME: row.COLUMN_NAME,
                 FINAL_COLUMN_NAME: row.COLUMN_NAME,
@@ -275,8 +318,8 @@ var vueObjectBusinessTabs = new Vue({
          * @constructor
          */
         InsertTableParam() {
-            var insertIndex = this.TableDialog.form.currentRowIndex;
-            var temp = {
+            let insertIndex = this.TableDialog.form.currentRowIndex;
+            let temp = {
                 COLUMN_COMMENT: this.TableDialog.form.COLUMN_COMMENT,
                 COLUMN_NAME: this.TableDialog.form.COLUMN_NAME,
                 FINAL_COLUMN_NAME: this.TableDialog.form.COLUMN_NAME,
@@ -289,27 +332,72 @@ var vueObjectBusinessTabs = new Vue({
             // this.updateTableFieldData();//更新finalTableData[]
         },
         /**
-         * 将手动拓展后的表格数据按照顺序重新封装成Vue数据，然后更新之。
+         *点击表格操作去的更多功能按钮的触发事件，用于展示更多的按钮
+         */
+        currentFieldFunction(index, row, column) {
+            this.currentFieldFunctionZone.centerDialogVisible = true;
+            this.currentFieldFunctionZone.index = index;
+            this.currentFieldFunctionZone.row = row;
+            this.currentFieldFunctionZone.column = column;
+            this.currentFieldFunctionZone.title = "当前处理字段：" + row.COLUMN_COMMENT + "\t使用代码" + row.FINAL_COLUMN_NAME;
+            //数据赋值之后，dialog里面的按钮操作就会从这里读数据，dialog写在html底部body前
+            // Layout布局的参数初始化一下
+            this.currentFieldFunctionZone.width_1 = 3;
+            this.currentFieldFunctionZone.width_2 = 4;
+            this.currentFieldFunctionZone.width_3 = 8;
+        },
+        /**
+         *更多代码的按钮
+         */
+        moreFunction(type) {
+            var _COLUMN_COMMENT = this.currentFieldFunctionZone.row.COLUMN_COMMENT;
+            var _COLUMN_NAME = this.currentFieldFunctionZone.row.FINAL_COLUMN_NAME;//使用FINAL_COLUMN_NAME
+            var _width_1 = this.currentFieldFunctionZone.width_1;
+            var _width_2 = this.currentFieldFunctionZone.width_2;
+            var _width_3 = this.currentFieldFunctionZone.width_3;
+            var _currentChooseDictionary = this.currentFieldFunctionZone.currentChooseDictionary;//字典值,是一个["1003", "10030002"]
+            console.log(_currentChooseDictionary);
+            $.ajax({
+                url: '/forMoreCode',
+                type: 'post',
+                data: {
+                    type: type,
+                    COLUMN_COMMENT: _COLUMN_COMMENT,
+                    COLUMN_NAME: _COLUMN_NAME,
+                    width_1: _width_1,
+                    width_2: _width_2,
+                    width_3: _width_3,
+                    currentChooseDictionary: JSON.stringify(_currentChooseDictionary)
+                },
+                dataType: 'text',
+                success: function (data) {
+                    console.log(data);
+                    vueObjectBusinessTabs.currentFieldFunctionZone.currentShowData = data;
+                }
+            });
+        },
+        /**
+         * 通过原始的dom操作读取整个表格的数据（可能是各种操作之后）：所以但凡是最终获取表格内容的话可以调这个方法
          * ElementUI和sortables.js不互动，所以要自己手动更新数据。
          */
         updateTableFieldData() {
-            console.log("更新数据中...........");
-            var tempNewData = [];
-            var tableTbody = $(".tableDocker tbody:first>tr");//tr对象数组
+            console.log("JS reading DOM of Tables...........");
+            let tempNewData = [];
+            let tableTbody = $(".tableDocker tbody:first>tr");//tr对象数组
             // 改造$.each，踩了一坑，因为查阅资料得知这个循环并不是按照页面显示的顺序来遍历的；
             for (let i = 0; i < tableTbody.length; i++) {
                 $.each(tableTbody, function (index, domElement) {
-                    var td_0 = domElement.getElementsByTagName("td")[0];//拿到第1个td
-                    var td_1 = domElement.getElementsByTagName("td")[1];//拿到第2个td
-                    var td_2 = domElement.getElementsByTagName("td")[2];//拿到第3个td
-                    var td_3 = domElement.getElementsByTagName("td")[3];//拿到第4个td
-                    var td_4 = domElement.getElementsByTagName("td")[4];//拿到第5个td
+                    let td_0 = domElement.getElementsByTagName("td")[0];//拿到第1个td
+                    let td_1 = domElement.getElementsByTagName("td")[1];//拿到第2个td
+                    let td_2 = domElement.getElementsByTagName("td")[2];//拿到第3个td
+                    let td_3 = domElement.getElementsByTagName("td")[3];//拿到第4个td
+                    let td_4 = domElement.getElementsByTagName("td")[4];//拿到第5个td
                     //从第一列获取序号
-                    var _index = td_0.getElementsByTagName("div")[0].getElementsByTagName("div")[0].innerHTML;
-                    var _TABLE_NAME = td_1.getElementsByTagName("div")[0].innerHTML;
-                    var _COLUMN_COMMENT = $(td_2).find("span[class*='el-tag']")[0].innerText;//$(js对象)是将js对象转jQuery对象；find()是找后代元素，children()是找子元素，“*=”是指包含；jquery除了get()得到是jQuery对象之外，其他find()等方法得到都是js对象
-                    var _COLUMN_NAME = $(td_3).find("div[class='cell']")[0].innerHTML;
-                    var _FINAL_COLUMN_NAME = $($(td_4).find("div[class='el-input']")[0]).find("input[class=el-input__inner]")[0].value;
+                    let _index = td_0.getElementsByTagName("div")[0].getElementsByTagName("div")[0].innerHTML;
+                    let _TABLE_NAME = td_1.getElementsByTagName("div")[0].innerHTML;
+                    let _COLUMN_COMMENT = $(td_2).find("span[class*='el-tag']")[0].innerText;//$(js对象)是将js对象转jQuery对象；find()是找后代元素，children()是找子元素，“*=”是指包含；jquery除了get()得到是jQuery对象之外，其他find()等方法得到都是js对象
+                    let _COLUMN_NAME = $(td_3).find("div[class='cell']")[0].innerHTML;
+                    let _FINAL_COLUMN_NAME = $($(td_4).find("div[class='el-input']")[0]).find("input[class=el-input__inner]")[0].value;
                     //从中定位到目标
                     if ((i + 1) == _index) {
                         // 都获取之后拼装json数组
@@ -334,16 +422,86 @@ var vueObjectBusinessTabs = new Vue({
             // console.log(this.newData);
             // console.log(this.finalTableData);
             // this.$forceUpdate();//Vue强制刷新组件，解决页面不刷新的问题
-            localStorageController('set', 'tableDataInLocalStorage', JSON.stringify(tempNewData));//存localStorage
+            // localStorageController('remove', 'tableDataInLocalStorage', null);//存localStorage
+            // localStorageController('set', 'tableDataInLocalStorage', JSON.stringify(tempNewData));//存localStorage
+            return tempNewData;
         },
+
         /**
          * 目的是能在这里调用this
          */
         globalForceUpdate() {
             this.$forceUpdate();
+        },
+        /**
+         * dealBusiness:加载业务数据，ajax
+         */
+        dealBusinessFunction(VueData) {
+            var _fewNum = this.InputNumberParams.fewNum;
+            if (_fewNum > 0) {
+                var tempArray = this.updateTableFieldData();//原始js变量dom获取数据
+                //利用splice()函数删除指定index之后的数据
+                tempArray.splice(_fewNum, (tempArray.length - _fewNum));
+                // console.log(tempArray);
+                // console.log(this.finalTableData);
+                $.ajax({
+                    url: VueData.url,
+                    type: 'post',
+                    data: {list: JSON.stringify(tempArray)},
+                    dataType: 'json',
+                    beforeSend: function () {
+                        VueData.percentage = 75;
+                        VueData.done = false;
+                        VueData.doing = true;
+                    },
+                    success: function (data) {
+                        VueData.percentage = 100;
+                        VueData.data = data;
+                        myLayer('.ajaxGetColNames', {tips: 1, message: '加载完成！'});
+                        console.log(vueObjectBusinessTabs.myObjects.dealBusiness.getColNames.data);
+                    },
+                    complete: function (XMLHttpRequest, textStatus) {
+                        VueData.done = true;
+                        VueData.doing = false;
+                    }
+                });
+            } else {
+            }
+        },
+        /**
+         * 按需加载字典表
+         */
+        loadBscDictionaryInfoTree() {
+            $.ajax({
+                url: '/loadBscDictionaryInfoTree',
+                type: 'post',
+                dataType: 'json',
+                beforeSend: function () {
+                },
+                success: function (data) {
+                    vueObjectBusinessTabs.currentFieldFunctionZone.bscDictionaryInfoTree = data;
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                }
+            });
         }
+    },
+    /**
+     * Vue对象的$watch方法，不知道为什么单独写不行，得写在对象里面的watch属性
+     */
+    watch: {
+        /**
+         * 监测vueObjectBusinessTabs对象的newData属性
+         * @param newVal
+         * @param oldVal
+         */
+        newData: function (newVal, oldVal) {
+            this.InputNumberParams.fewNum = this.newData.length;
+        },
     }
 });
+//============================================================================================================================================================================
+
 //============================================================================================================================================================================
 //
 /**
@@ -355,8 +513,8 @@ var vueObjectBusinessTabs = new Vue({
  */
 function bulidSortableAfterGetData() {
     // ==================================================
-    var el = $(".tableDocker tbody:first").get(0);//选中ul类型的元素，这里因为是ElementUI渲染出来的所以是tbody下面一组tr;然后将jQuery对象转成js对象，因为这是Sortable.min.js插件要求的
-    var sortable = Sortable.create(el, {
+    let el = $(".tableDocker tbody:first").get(0);//选中ul类型的元素，这里因为是ElementUI渲染出来的所以是tbody下面一组tr;然后将jQuery对象转成js对象，因为这是Sortable.min.js插件要求的
+    let sortable = Sortable.create(el, {
         // 参数列表，参考http://www.sortablejs.com/             或者 https://www.jianshu.com/p/887ab28bdea0
         animation: 150,
         ghostClass: 'blue-background-class',
@@ -366,11 +524,11 @@ function bulidSortableAfterGetData() {
          */
         onEnd: function (/**Event*/evt) {
             // 每次拖拽后刷新排序值，
-            var tableTbody = $(".tableDocker tbody:first>tr");//tr对象数组
+            let tableTbody = $(".tableDocker tbody:first>tr");//tr对象数组
             $.each(tableTbody, function (index, domElement) {
-                var temp = domElement.getElementsByTagName("td")[0];//拿到第一个td
-                // var temp = domElement.children("td").eq(0);
-                var nextTemp = temp.getElementsByTagName("div")[0].getElementsByTagName("div")[0];
+                let temp = domElement.getElementsByTagName("td")[0];//拿到第一个td
+                // let temp = domElement.children("td").eq(0);
+                let nextTemp = temp.getElementsByTagName("div")[0].getElementsByTagName("div")[0];
                 nextTemp.innerHTML = index + 1;//注意是等于号，不是方法
             })
             //完成之后更新数据
@@ -380,7 +538,7 @@ function bulidSortableAfterGetData() {
 }
 
 //============================================================================================================================================================================
-var CarouselWithAlertObj = new Vue({
+let CarouselWithAlertObj = new Vue({
     el: '#CarouselWithAlert',
     data: {
         showCarouselWithAlert: true,
@@ -394,7 +552,7 @@ var CarouselWithAlertObj = new Vue({
 });
 
 //============================================================================================================================================================================
-var textingObj = new Vue({
+let textingObj = new Vue({
     el: '#texting', methods: {
         getCookie: function () {
             console.log(localStorageController('get', 'tableDataInLocalStorage'));

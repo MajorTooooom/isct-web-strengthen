@@ -10,6 +10,7 @@
 <script src="../static/framework/element-ui-2.13.2/lib/index.js"></script>
 <script src="../static/framework/sortable/Sortable.min.js"></script>
 <script src="../static/framework/layui/layui.js"></script>
+<script src="../static/framework/clipboard.js/clipboard.js"></script>
 <link rel="stylesheet" href="../static/framework/csshake/csshake.css">
 <link rel="stylesheet" href="../static/framework/font-awesome-4.7.0/css/font-awesome.css">
 <link rel="stylesheet" href="../static/framework/element-ui-2.13.2/lib/theme-chalk/index.css">
@@ -136,14 +137,15 @@
         <el-tab-pane label="选择字段" name="second">
             <div class="tabContext">
                 <el-row>
-                    <el-col :span="24" v-bind:style="{height:'10px'}"></el-col>
+                    <el-col :span="24" v-bind:style="{height:'10px'}"><!--占位行而已--></el-col>
                 </el-row>
                 <el-row>
-                    <el-col :span="3">
+                    <el-col :span="6">
+                        <!--一个对表格数据信息做展示的dashboard面板-->
                         <div :class="{TableDashboard:true}">
                             <el-card class="box-card" shadow="hover">
                                 <div slot="header" class="clearfix">
-                                    <span>DashBoard</span>
+                                    <span>DashBoard字段</span>
                                     <el-tooltip class="item" effect="dark" content="根据选定的表格从数据库加载" placement="top">
                                         <el-button @click="loadTableFields" :class="{locationCs:true}">
                                             <span>加载</span>
@@ -151,17 +153,62 @@
                                     </el-tooltip>
                                 </div>
                                 <p class="item">已选表格:&nbsp;{{selectArray.length}}&nbsp;张</p>
-                                <p class="item">已选:&nbsp;{{newData.length}}&nbsp;个</p>
-                                <p class="item">已选:&nbsp;{{finalTableData.length}}&nbsp;个</p>
+                                <p class="item">字段数:&nbsp;{{newData.length}}&nbsp;个</p>
                             </el-card>
                         </div>
+                        <!--功能按钮区-->
+                        <div :class="{functionBtnsForTables:true}">
+                            <div>
+                                <!--选择前几个字段作为处理的根据-->
+                                <span>使用前</span>
+                                <el-input-number size="mini" v-model="InputNumberParams.fewNum" :precision="0" :step="1" :min="0" :max="newData.length" id="locationInputNumber"></el-input-number>
+                                <span>个字段</span>&nbsp;<span style="font-weight: bold" @click="maxedInputNumberParams">(MAX)</span>
+                            </div>
+                            <div>
+                                <p>
+                                    <el-button-group>
+                                        <!--<el-button size="mini" type="primary" icon="el-icon-arrow-left" :disabled="myObjects.dealBusiness.getColNames.doing"-->
+                                        <el-button size="mini" type="primary" icon="el-icon-arrow-left" :disabled="myObjects.dealBusiness.getColNames.doing"
+                                                   @click="dealBusinessFunction(myObjects.dealBusiness.getColNames)">获取/重新获取
+                                        </el-button>
+                                        <el-button @click="showAllReturnData(99)" size="mini" type="success" icon="el-icon-water-cup" class="ajaxGetColNames"
+                                                   :disabled="!myObjects.dealBusiness.getColNames.done">ALLDATA
+                                        </el-button>
+                                    </el-button-group>
+                                    <el-progress :percentage="myObjects.dealBusiness.getColNames.percentage" color="#409eff"></el-progress>
+                                </p>
+                            </div>
+                            <div>
+                                <el-button-group>
+                                    <el-button size="mini" type="success" icon="el-icon-arrow-left" @click="showAllReturnData(1)">查看</el-button>
+                                    <el-button size="mini" type="success" icon="fa-eercast fa">CloNames</el-button>
+                                    <el-button size="mini" type="success" class="clipboardBtn clipboardBtnColNames" :data-clipboard-text="myObjects.dealBusiness.getColNames.data.ColNames">剪切板 <i
+                                            class="el-icon-arrow-right"></i></el-button>
+                                    <script>
+                                        $(function () {
+                                            $(".clipboardBtnColNames").click(function () {
+                                                myLayer('.clipboardBtnColNames', {message: '复制成功', tips: 2});
+                                            });
+                                        });
+                                    </script>
+                                </el-button-group>
+                            </div>
+                            <div>
+                                <el-button-group>
+                                    <el-button size="mini" type="success" icon="el-icon-arrow-left" @click="showAllReturnData(2)">查看</el-button>
+                                    <el-button size="mini" type="success" icon="fa-eercast fa">colModel</el-button>
+                                    <el-button size="mini" type="success" class="clipboardBtn" @click="showAllReturnData(2)">剪切板 <i
+                                            class="el-icon-arrow-right"></i></el-button>
+                                </el-button-group>
+                            </div>
+                        </div>
                     </el-col>
-                    <el-col :span="21">
+                    <el-col :span="18">
                         <div class="tableDocker TableDashboard">
                             <el-table :data="newData" style="width: 100%" :row-class-name="tableRowClassName" stripe>
                                 <el-table-column type="index" label="sort" width="50"></el-table-column>
-                                <el-table-column prop="TABLE_NAME" label="表名" width="250"></el-table-column>
-                                <el-table-column prop="COLUMN_COMMENT" label="字段描述" width="180">
+                                <el-table-column prop="TABLE_NAME" label="表名" width="180"></el-table-column>
+                                <el-table-column prop="COLUMN_COMMENT" label="字段描述" width="140">
                                     <template slot-scope="scope">
                                         <el-popover trigger="hover" placement="top">
                                             <!--p标签内容是tag的内容-->
@@ -176,8 +223,8 @@
                                         </el-popover>
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="COLUMN_NAME" label="字段名" width="250"></el-table-column>
-                                <el-table-column prop="_" label="最终字段" width="250">
+                                <el-table-column prop="COLUMN_NAME" label="字段名" width="180"></el-table-column>
+                                <el-table-column prop="_" label="最终字段" width="200">
                                     <!--↑↑列的内容不载是值，而是套了一个输入框，输入框的值和tableData的属性FINAL_COLUMN_NAME绑定-->
                                     <template slot="header" slot-scope="scope">
                                         <div class="top">
@@ -190,7 +237,7 @@
                                         <el-input v-model="scope.row.FINAL_COLUMN_NAME"></el-input>
                                     </template>
                                 </el-table-column>
-                                <el-table-column prop="_operation_" label="操作" width="280">
+                                <el-table-column prop="_operation_" label="操作" width="245">
                                     <template slot-scope="scope">
                                         <el-button size="mini" @click="addOneJson(scope.$index, scope.row,scope.column)">
                                             <el-tooltip content="你可以在此位置插入一条自定义的数据" placement="top">
@@ -198,7 +245,7 @@
                                                 <span><i class="fa-plus fa fa-1x"></i></span>
                                             </el-tooltip>
                                         </el-button>
-                                        <el-button size="mini" type="danger" @click="topOneJson(scope.$index, scope.row,scope.column)">
+                                        <el-button size="mini" type="warning" @click="topOneJson(scope.$index, scope.row,scope.column)">
                                             <el-tooltip content="你可以将此位置的数据置顶" placement="top">
                                                 <span><i class="fa-arrow-up fa"></i></span>
                                             </el-tooltip>
@@ -206,6 +253,11 @@
                                         <el-button size="mini" type="danger" @click="deleteOneJson(scope.$index, scope.row,scope.column)">
                                             <el-tooltip content="删除" placement="top">
                                                 <span><i class="fa fa-trash-o"></i></span>
+                                            </el-tooltip>
+                                        </el-button>
+                                        <el-button size="mini" type="success" @click="currentFieldFunction(scope.$index, scope.row,scope.column)">
+                                            <el-tooltip content="功能" placement="top">
+                                                <span><i class="fa fa-paper-plane"></i></span>
                                             </el-tooltip>
                                         </el-button>
                                     </template>
@@ -243,6 +295,89 @@
             </div>
         </el-dialog>
     </div>
+    <!---------------------------------------一个需要放在组件内部的隐藏对话框，在table组件的事件里面触发--------------------------------->
+    <div>
+        <el-dialog title="数据展示" :visible.sync="myObjects.dealBusiness.getColNames.dialogShow">
+            <textarea id="colNameVal" class="colNameValClass" v-model="myObjects.dealBusiness.getColNames.whatToShow_2">
+            </textarea>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="myObjects.dealBusiness.getColNames.dialogShow = false">取 消</el-button>
+                <el-button class="clipboardBtn" type="primary" @click="myObjects.dealBusiness.getColNames.dialogShow = false" data-clipboard-target="#colNameVal">
+                    复制至剪切板
+                </el-button>
+            </div>
+        </el-dialog>
+    </div>
+    <!---------------------------------------一个需要放在组件内部的隐藏对话框，在table组件的事件里面触发--------------------------------->
+    <div data-description="这个一个表格功能按钮的dialog对话框目的是放更多的按钮" id="currentFieldFunctionZone">
+        <el-dialog
+                :title="currentFieldFunctionZone.title"
+                :visible.sync="currentFieldFunctionZone.centerDialogVisible"
+                width="60%"
+                center
+                :class="{moreFunctionBtnC:true}"
+        >
+            <!--内容区-->
+            <div>
+                基础Layout布局参数：
+                <el-input-number size="mini" v-model="currentFieldFunctionZone.width_1"></el-input-number>
+                <el-input-number size="mini" v-model="currentFieldFunctionZone.width_2"></el-input-number>
+                <el-input-number size="mini" v-model="currentFieldFunctionZone.width_3"></el-input-number>
+            </div>
+            <div :class="{moreFunctionBtnC:true}">
+                <el-input size="mini" placeholder="请输入内容" v-model="currentFieldFunctionZone.row.COLUMN_COMMENT" :class="{inlinkblockInput:true}">
+                    <template slot="prepend">如需自定义</template>
+                </el-input>
+            </div>
+            <div :class="{moreFunctionBtnC:true}">
+                <div>
+                    <el-button-group>
+                        <el-button size="mini" plain icon="el-icon-full-screen" @click="moreFunction('input')">输入框input</el-button>
+                        <el-button size="mini" plain icon="fa-tv fa" @click="currentFieldFunctionZone.innerVisible=true"></el-button>
+                    </el-button-group>
+                </div>
+                <div>
+                    <el-button-group>
+                        <el-button size="mini" plain icon="el-icon-full-screen" @click="moreFunction('preloadingInput')">预载式输入框input</el-button>
+                        <el-button size="mini" plain icon="fa-tv fa" @click="currentFieldFunctionZone.innerVisible=true"></el-button>
+                    </el-button-group>
+                </div>
+                <div>
+                    <el-button-group>
+                        <el-button size="mini" icon="el-icon-full-screen" @click="moreFunction('timeWithEnd')">需求月份起止</el-button>
+                        <el-button size="mini" icon="fa-tv fa" @click="currentFieldFunctionZone.innerVisible=true"></el-button>
+                    </el-button-group>
+                </div>
+                <div>
+                    <el-button-group>
+                        <el-button size="mini" icon="el-icon-full-screen" @click="moreFunction('dropDownBox')">下拉框</el-button>
+                        <el-button size="mini" icon="fa-tv fa" @click="currentFieldFunctionZone.innerVisible=true"></el-button>
+                    </el-button-group>
+                </div>
+                <div>
+                    <span><el-button size="mini" icon="fa-tv fa" @click="loadBscDictionaryInfoTree">加载字典表</el-button></span>
+                    <span><el-cascader placeholder="试试搜索：状态" :options="currentFieldFunctionZone.bscDictionaryInfoTree" filterable size="mini"
+                                       v-model="currentFieldFunctionZone.currentChooseDictionary"></el-cascader></span>
+                    <el-button-group>
+                        <el-button size="mini" icon="el-icon-full-screen" @click="moreFunction('dropDownBox')">下拉单选框（字典表）</el-button>
+                        <el-button size="mini" icon="fa-tv fa" @click="currentFieldFunctionZone.innerVisible=true"></el-button>
+                    </el-button-group>
+                </div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="currentFieldFunctionZone.centerDialogVisible = false" size="mini">取 消</el-button>
+                <el-button type="primary" @click="currentFieldFunctionZone.centerDialogVisible = false" size="mini">确 定</el-button>
+            </span>
+            <!--内层dialog属性append-to-body-->
+            <el-dialog width="80%" title="context" :visible.sync="currentFieldFunctionZone.innerVisible" append-to-body>
+                <textarea id="htmlCode" class="indialog" v-model="currentFieldFunctionZone.currentShowData"></textarea>
+                <el-button class="clipboardBtn" type="warning" size="mini" data-clipboard-target="#htmlCode" @click="currentFieldFunctionZone.innerVisible=false">
+                    复制至剪切板
+                </el-button>
+            </el-dialog>
+        </el-dialog>
+    </div>
+    <!---------------------------------------一个需要放在组件内部的隐藏对话框，在table组件的事件里面触发--------------------------------->
 </div>
 <div id="notificationBusiness"><!--这是一个消息提示组件--></div>
 <!--这是一个回到顶部组件-->
@@ -253,6 +388,7 @@
     <!--这是一个loading组件-->
 </div>
 <div id="texting"></div>
+<div id="foot"></div>
 </body>
 <!-------------------------------------------------------------------------------------------------------------------------------->
 <script type="text/template" id="">

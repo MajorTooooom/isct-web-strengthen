@@ -18,6 +18,11 @@ function localStorageController(type, key, value) {
     }
 }
 
+/**
+ *
+ * @param IdOrClass 必须，绑定元素
+ * @param options ：message必须
+ */
 function myLayer(IdOrClass, options) {
     layui.use('layer', function () {
         var myGlobalLayer = layui.layer;

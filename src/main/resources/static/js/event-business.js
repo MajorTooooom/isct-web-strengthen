@@ -4,8 +4,9 @@
 
 $(function () {
     // $.cookie('cckk', '读取cookie成功', {expires: 1});
-    notificationBusiness.businessOpenNotification({title: '正在测试连接状态', message: 'waiting..........', offset: 100, duration: 0, position: 'bottom-right'});
+    notificationBusiness.businessOpenNotification({title: '正在测试连接状态', message: 'waiting..........', offset: 100, duration: 1000, position: 'bottom-right'});
     testConnection();
+    new ClipboardJS('.clipboardBtn');//启动剪切板插件
 });
 
 
@@ -31,11 +32,7 @@ function testConnection() {
             fillSelectDocker(data.data);//将获取的数据填充到Vue对象，使得select组件填充数据
             vueObjectMainDrawer.myObjects.systemMessage.status = '已连接';
             vueObjectBusinessTabs.myObjects.FFFFFFFFFFFFFFFFObj.msg = '已加载表格' + data.data.length + '张';
-            setTimeout(function () {
-            }, 300);
-            setTimeout(function () {
-                notificationBusiness.businessOpenNotification({title: '消息', message: data.message, offset: 100, duration: 0, position: 'top-right'});
-            }, 500);
+            notificationBusiness.businessOpenNotification({title: '消息', message: data.message, offset: 300, duration: 2000, position: 'top-right'});
             vueObjectMainDrawer.myObjects.imgSrc = 'static/img/cat-day-innocent.png';
         },
         complete: function (XMLHttpRequest, status) { //当请求完成时调用函数
