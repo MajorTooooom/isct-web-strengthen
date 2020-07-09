@@ -96,7 +96,7 @@
                 <p style="height: 6px;"><!--占位行--></p>
                 <el-row>
                     <el-col :span="6" v-bind:class="{vueClassTabBaneCol:true}">
-                        <div class="text-align">
+                        <div class="btnFirst">
                             <!--下拉列表组件：已加载表格XXX张-->
                             <el-dropdown split-button type="primary" @command="FFFFFFFFFFFFFFFF" @click="FFFFFFFFFFFFFFFFLoad">
                                 {{myObjects.FFFFFFFFFFFFFFFFObj.msg}}
@@ -107,17 +107,23 @@
                             </el-dropdown>
                         </div>
                         <p style="height: 15px"></p>
-                        <div class="textAlign">
+                        <div class="btnFirst">
                             <div class="selectSummit">
                                 <el-button type="success" plain @click="selectSummit"><i class="fa fa-check-square" aria-hidden="false"></i>&nbsp;使用所选</el-button>
                             </div>
                         </div>
+                        <div class="btnFirst">
+                            <el-button type="danger" plain @click="selectArray=[]"><i class="el-icon-delete-solid" aria-hidden="false"></i>&nbsp;清除所选</el-button>
+                        </div>
                     </el-col>
                     <el-col :span="10">
                         <!--【select组件】-->
-                        <el-select v-model="selectArray" filterable clearable multiple placeholder="请选择表格....." :style="{width:'80%',border:'#2f34ff 2px solid',borderRadius:'4px'}" @focus="messageForSelect">
-                            <el-option v-for="(item,index) in selectDataTableNames" :key="index" :label="item.label" :value="item.value"></el-option>
-                        </el-select>
+                        <div style="margin-top: 100px;">
+                            <el-select v-model="selectArray" filterable clearable multiple placeholder="请选择表格....." :style="{width:'80%',border:'#2f34ff 2px solid',borderRadius:'4px'}"
+                                       @focus="messageForSelect">
+                                <el-option v-for="(item,index) in selectDataTableNames" :key="index" :label="item.label" :value="item.value"></el-option>
+                            </el-select>
+                        </div>
                     </el-col>
                     <el-col :span="8">
                         <!--预览区-->
@@ -175,8 +181,9 @@
                                                    :disabled="!myObjects.dealBusiness.getColNames.done">ALLDATA
                                         </el-button>
                                     </el-button-group>
-                                    <el-progress :percentage="myObjects.dealBusiness.getColNames.percentage" color="#409eff"></el-progress>
+                                    <el-progress :percentage="myObjects.dealBusiness.getColNames.percentage" color="#409eff"><!--一个进度条组件--></el-progress>
                                 </p>
+                                <el-link type="warning">请注意：每次改变表格状态后需重新加载</el-link>
                             </div>
                             <div>
                                 <el-button-group>
@@ -200,6 +207,9 @@
                                     <el-button size="mini" type="success" class="clipboardBtn" @click="showAllReturnData(2)">剪切板 <i
                                             class="el-icon-arrow-right"></i></el-button>
                                 </el-button-group>
+                            </div>
+                            <div>
+                                <el-button size="mini" type="success" icon="fa-eercast fa" @click="getEntityFields">实体类字段</el-button>
                             </div>
                         </div>
                     </el-col>
@@ -278,6 +288,15 @@
     <!---------------------------------------一个需要放在组件内部的隐藏对话框，在table组件的事件里面触发--------------------------------->
     <div MyDescription="需要放在组件内部的隐藏对话框，在table组件的事件里面触发">
         <el-dialog title="你可以在当前位置插入一行数据" :visible.sync="TableDialog.dialogFormVisible">
+            <div>
+                <div style="display:inline-block;">
+                    <el-button type="warning" plain size="mini" :loading="allTableAndFieldsLoading" @click="loadDataAllTableAndFields">DataBase</el-button>
+                </div>
+                <div style="display:inline-block;">
+                    <el-cascader @change="fillallTableAndFields_select" v-model="allTableAndFields_select" :options="allTableAndFields" :props="{ expandTrigger: 'hover' }" size="mini" filterable></el-cascader>
+                </div>
+            </div>
+            <el-divider content-position="left">你可以从数据库加载或者直接填写</el-divider>
             <el-form ref="form" :model="TableDialog.form" label-width="80px">
                 <el-form-item label="表名" size="mini">
                     <el-input v-model="TableDialog.form.TABLE_NAME"></el-input>
@@ -367,7 +386,52 @@
                     <el-button-group>
                         <el-button size="mini" icon="el-icon-full-screen" @click="moreFunction('dropDownBox_other')">下拉单选框（非字典表）</el-button>
                         <el-button size="mini" icon="fa-tv fa" @click="currentFieldFunctionZone.innerVisible=true"></el-button>
-                        <span>&nbsp;&nbsp;&nbsp;请手动输入data-otype的值</span>
+                        <span>&nbsp;&nbsp;&nbsp;请手动输入data-otype的值</span>&nbsp;&nbsp;<span>参考：static/modules/commonbusiness/com-constant.js</span>
+                    </el-button-group>
+                </div>
+                <div>
+                    <div style="display: inline-block">
+                        <div style="display: inline-block">
+                            <el-radio-group v-model="currentFieldFunctionZone.ifCurrentTable" size="mini">
+                                <el-radio-button :label=true>当前表</el-radio-button>
+                                <el-radio-button :label=false>联表</el-radio-button>
+                            </el-radio-group>
+                        </div>
+                        <span>index</span>
+                        <div style="display: inline-block">
+                            <el-input-number size="mini" v-model="currentFieldFunctionZone.fieldIndex"></el-input-number>
+                        </div>
+                        <span>(负数代表@ExcelIgnore)</span>
+                    </div>
+                    <div style="display: inline-block;">
+                        <el-select v-model="currentFieldFunctionZone.currentfieldTypes" placeholder="字段类型">
+                            <el-option size="mini"
+                                       v-for="item in currentFieldFunctionZone.fieldTypes"
+                                       :key="item.value"
+                                       :label="item.label"
+                                       :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </div>
+                    <div style="display: inline-block">
+                        <el-button-group>
+                            <el-button size="mini" type="warning" icon="fa fa-database" @click="moreFunction('entityField')"><span>&nbsp;字段</span></el-button>
+                            <el-button size="mini" icon="fa-tv fa" @click="currentFieldFunctionZone.innerVisible=true">check</el-button>
+                        </el-button-group>
+                    </div>
+                </div>
+                <div>
+                    <el-divider content-position="left">以下是XML代码相关</el-divider>
+                </div>
+                <div>
+                    <el-button-group>
+                        <el-button size="mini" icon="el-icon-full-screen" @click="moreFunction('xml_timeStartEnd')">时间字段起止</el-button>
+                    </el-button-group>
+                    <div style="display: inline-block">
+                        <el-input size="mini" v-model="currentFieldxml.alias" placeholder="请输入表格别名"></el-input>
+                    </div>
+                    <el-button-group>
+                        <el-button size="mini" icon="fa-tv fa" @click="currentFieldFunctionZone.innerVisible=true"></el-button>
                     </el-button-group>
                 </div>
             </div>
@@ -376,7 +440,7 @@
                 <el-button type="primary" @click="currentFieldFunctionZone.centerDialogVisible = false" size="mini">确 定</el-button>
             </span>
             <!--内层dialog属性append-to-body-->
-            <el-dialog width="80%" title="context" :visible.sync="currentFieldFunctionZone.innerVisible" append-to-body>
+            <el-dialog width="80%" title="context" :visible.sync="currentFieldFunctionZone.innerVisible" append-to-body @closed="testClose">
                 <textarea id="htmlCode" class="indialog" v-model="currentFieldFunctionZone.currentShowData"></textarea>
                 <el-button class="clipboardBtn" type="warning" size="mini" data-clipboard-target="#htmlCode" @click="currentFieldFunctionZone.innerVisible=false">
                     复制至剪切板

@@ -1,6 +1,6 @@
-<div class='col-xs-4 col-sm-4 col-md-4 col-lg-4'>
-    <label class="col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label">采购计划员:</label>
-    <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-        <select class="form-control" name="purchasePlannerId" data-otype="PURCHASING_PLANNER"></select>
-    </div>
-</div>
+/**
+*供应商
+*/
+@ExcelProperty(value = "供应商", index = 0)
+@TableField(exist = false)
+private String supplierAbbr;

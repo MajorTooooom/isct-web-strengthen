@@ -21,4 +21,18 @@ public class TableController {
         String[] tables = request.getParameterValues("tables");
         return tableService.loadAllTableFields(tables);
     }
+
+
+    @RequestMapping("/loadDataAllTableAndFields")
+    @ResponseBody
+    public String loadDataAllTableAndFields() {
+        return tableService.loadDataAllTableAndFields();
+    }
+
+    @RequestMapping("/getEntityFields")
+    @ResponseBody
+    public String getEntityFields(String selectArray) {
+        JSONArray jsonArray = JSONArray.parseArray(selectArray);
+        return tableService.getEntityFields(jsonArray);
+    }
 }

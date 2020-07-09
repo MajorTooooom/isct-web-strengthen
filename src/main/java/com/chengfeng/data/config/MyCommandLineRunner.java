@@ -10,7 +10,6 @@ public class MyCommandLineRunner implements CommandLineRunner {
 
         if (true) {
             String cmd = "C:\\Users\\Administrator\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe" + " " + "http://localhost:6688";
-            System.out.println("========================================================");
             Runtime run = Runtime.getRuntime();
             try {
                 run.exec(cmd);

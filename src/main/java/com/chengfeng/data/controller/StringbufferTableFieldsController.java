@@ -24,7 +24,7 @@ public class StringbufferTableFieldsController {
 
     @RequestMapping("/forMoreCode")
     @ResponseBody
-    public String forMoreCode(String type, String COLUMN_COMMENT, String COLUMN_NAME, String width_1, String width_2, String width_3, String currentChooseDictionary) {
+    public String forMoreCode(String type, String COLUMN_COMMENT, String COLUMN_NAME, String width_1, String width_2, String width_3, String currentChooseDictionary, int fieldIndex, boolean ifCurrentTable, String currentfieldTypes, String alias) {
         Map<String, Object> options = new HashMap<>();
         options.put("type", type);
         options.put("COLUMN_COMMENT", COLUMN_COMMENT);
@@ -33,9 +33,13 @@ public class StringbufferTableFieldsController {
         options.put("width_2", width_2);
         options.put("width_3", width_3);
         options.put("currentChooseDictionary", currentChooseDictionary);
+        options.put("fieldIndex", fieldIndex);
+        options.put("ifCurrentTable", ifCurrentTable);
+        options.put("currentfieldTypes", currentfieldTypes);
+        options.put("alias", (alias == null || alias.equals("") ? "缺少别名" : alias));
+
         return stringbufferTableFieldsService.forMoreCode(options);
     }
-
 
 
     @RequestMapping("/loadBscDictionaryInfoTree")

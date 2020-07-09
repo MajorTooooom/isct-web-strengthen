@@ -49,6 +49,10 @@ public class StringbufferTableFieldsServiceImpl implements StringbufferTableFiel
             return forMoreCode_dropDownBox(options);
         } else if (type.equals("dropDownBox_other")) {
             return forMoreCode_dropDownBox_other(options);
+        } else if (type.equals("entityField")) {
+            return forMoreCode_entityField(options);
+        } else if (type.equals("xml_timeStartEnd")) {
+            return forMoreCode_xml_timeStartEnd(options);
         }
 
 
@@ -330,9 +334,54 @@ public class StringbufferTableFieldsServiceImpl implements StringbufferTableFiel
         String s = "<div class='col-xs-4 col-sm-4 col-md-4 col-lg-4'>\n".replaceAll("4", width_1) +
                 "    <label class=\"col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label\">".replaceAll("4", width_2) + COLUMN_COMMENT + ":</label>\n" +
                 "    <div class=\"col-xs-8 col-sm-8 col-md-8 col-lg-8\">\n".replaceAll("8", width_3) +
-                "        <select class=\"form-control\" name=\""+HumpUtils.dealHump(COLUMN_NAME)+"\" data-otype=\"请手动输入你的数据\"></select>\n" +
+                "        <select class=\"form-control\" name=\"" + HumpUtils.dealHump(COLUMN_NAME) + "\" data-otype=\"请手动输入你的数据\"></select>\n" +
                 "    </div>\n" +
                 "</div>";
+        return s;
+    }
+
+    private String forMoreCode_entityField(Map<String, Object> options) {
+        String type = options.get("type") == null ? "" : options.get("type").toString();
+        String COLUMN_COMMENT = options.get("COLUMN_COMMENT") == null ? "" : options.get("COLUMN_COMMENT").toString();
+        String COLUMN_NAME = options.get("COLUMN_NAME") == null ? "" : options.get("COLUMN_NAME").toString();
+        String width_1 = options.get("width_1") == null ? "" : options.get("width_1").toString();
+        String width_2 = options.get("width_2") == null ? "" : options.get("width_2").toString();
+        String width_3 = options.get("width_3") == null ? "" : options.get("width_3").toString();
+        String currentChooseDictionary = options.get("currentChooseDictionary") == null ? "" : options.get("currentChooseDictionary").toString();
+        boolean ifCurrentTable = options.get("ifCurrentTable") == null ? false : (boolean) options.get("ifCurrentTable");
+        int fieldIndex = options.get("fieldIndex") == null ? -1 : Integer.parseInt(options.get("fieldIndex").toString());
+        String currentfieldTypes = options.get("currentfieldTypes") == null ? "" : options.get("currentfieldTypes").toString();
+        String s = "/**\n" +
+                "*" + COLUMN_COMMENT + "\n" +
+                "*/\n" +
+                (currentfieldTypes.equals("Date") ? ("@JsonFormat(timezone = \"GMT+8\", pattern = \"yyyy-MM-dd HH:mm:ss\")" + "\n" + "@DateTimeFormat(pattern = \"yyyy-MM-dd\")" + "\n") : "") +
+                //"@ExcelProperty(value = \"供应商\", index = 0)\n" +
+                (fieldIndex > 0 ? "@ExcelProperty(value = \"" + COLUMN_COMMENT + "\", index = " + fieldIndex + ")\n" : ("@ExcelIgnore" + "\n")) +
+//                "@TableField(exist = false)\n" +
+                (ifCurrentTable ? "" : "@TableField(exist = false)\n") +
+                "private " + currentfieldTypes + " " + HumpUtils.dealHump(COLUMN_NAME) + ";";
+        return s;
+    }
+
+    private String forMoreCode_xml_timeStartEnd(Map<String, Object> options) {
+        String type = options.get("type") == null ? "" : options.get("type").toString();
+        String COLUMN_COMMENT = options.get("COLUMN_COMMENT") == null ? "" : options.get("COLUMN_COMMENT").toString();
+        String COLUMN_NAME = options.get("COLUMN_NAME") == null ? "" : options.get("COLUMN_NAME").toString();
+        String width_1 = options.get("width_1") == null ? "" : options.get("width_1").toString();
+        String width_2 = options.get("width_2") == null ? "" : options.get("width_2").toString();
+        String width_3 = options.get("width_3") == null ? "" : options.get("width_3").toString();
+        String alias = options.get("alias") == null ? "" : options.get("alias").toString();
+        String currentChooseDictionary = options.get("currentChooseDictionary") == null ? "" : options.get("currentChooseDictionary").toString();
+        boolean ifCurrentTable = options.get("ifCurrentTable") == null ? false : (boolean) options.get("ifCurrentTable");
+        int fieldIndex = options.get("fieldIndex") == null ? -1 : Integer.parseInt(options.get("fieldIndex").toString());
+        String currentfieldTypes = options.get("currentfieldTypes") == null ? "" : options.get("currentfieldTypes").toString();
+        //deal
+        String s = "        <if test=\"object." + HumpUtils.dealHump(COLUMN_NAME) + " != null\">\n" +
+                "            AND (" + alias + ".`" + COLUMN_NAME + "`) <![CDATA[ >= ]]> date_format(#{object." + HumpUtils.dealHump(COLUMN_NAME) + "},'%y-%m-%d')\n" +
+                "        </if>\n" +
+                "        <if test=\"object." + HumpUtils.dealHump(COLUMN_NAME) + "End != null\">\n" +
+                "            AND (" + alias + ".`" + COLUMN_NAME + "`) <![CDATA[ <= ]]> date_format(#{object." + HumpUtils.dealHump(COLUMN_NAME) + "End},'%y-%m-%d')\n" +
+                "        </if>";
         return s;
     }
 }
