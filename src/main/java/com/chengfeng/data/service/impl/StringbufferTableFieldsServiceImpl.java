@@ -277,7 +277,7 @@ public class StringbufferTableFieldsServiceImpl implements StringbufferTableFiel
         String s = "<div class='col-xs-3 col-sm-3 col-md-3 col-lg-3'>\n".replaceAll("3", width_1) +
                 "    <label class=\"col-xs-4 col-sm-4 col-md-4 col-lg-4 control-label\">".replaceAll("4", width_2) + COLUMN_COMMENT + ":</label>\n" +
                 "    <div class=\"col-xs-8 col-sm-8 col-md-8 col-lg-8\">\n".replaceAll("8", width_3) +
-                "        <input class=\"form-control\" data-openpopup=\"SUPPLIER\" name=\"" + HumpUtils.dealHump(COLUMN_NAME) + "\" placeholder=\"请输入" + COLUMN_COMMENT + "...\" type=\"text\">\n" +
+                "        <input class=\"form-control\" data-openpopup=\"SUPPLIER\" data-cdname=\"" + HumpUtils.dealHump(COLUMN_NAME) + "\" placeholder=\"请输入" + COLUMN_COMMENT + "...\" type=\"text\">\n" +
                 "    </div>\n" +
                 "</div>";
         return s;
