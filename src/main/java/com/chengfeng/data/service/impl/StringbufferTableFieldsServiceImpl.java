@@ -376,12 +376,12 @@ public class StringbufferTableFieldsServiceImpl implements StringbufferTableFiel
         int fieldIndex = options.get("fieldIndex") == null ? -1 : Integer.parseInt(options.get("fieldIndex").toString());
         String currentfieldTypes = options.get("currentfieldTypes") == null ? "" : options.get("currentfieldTypes").toString();
         //deal
-        String s = "        <if test=\"object." + HumpUtils.dealHump(COLUMN_NAME) + " != null\">\n" +
-                "            AND (" + alias + ".`" + COLUMN_NAME + "`) <![CDATA[ >= ]]> date_format(#{object." + HumpUtils.dealHump(COLUMN_NAME) + "},'%y-%m-%d')\n" +
-                "        </if>\n" +
-                "        <if test=\"object." + HumpUtils.dealHump(COLUMN_NAME) + "End != null\">\n" +
-                "            AND (" + alias + ".`" + COLUMN_NAME + "`) <![CDATA[ <= ]]> date_format(#{object." + HumpUtils.dealHump(COLUMN_NAME) + "End},'%y-%m-%d')\n" +
-                "        </if>";
+        String s = "<if test=\"object." + HumpUtils.dealHump(COLUMN_NAME) + " != null\">\n" +
+                "    AND date_format((" + alias + ".`" + COLUMN_NAME + "`),'%y-%m-%d') <![CDATA[ >= ]]> date_format(#{object." + HumpUtils.dealHump(COLUMN_NAME) + "},'%y-%m-%d')\n" +
+                "</if>\n" +
+                "<if test=\"object.orderDateEnd != null\">\n" +
+                "    AND date_format((" + alias + ".`" + COLUMN_NAME + "`),'%y-%m-%d') <![CDATA[ <= ]]> date_format(#{object." + HumpUtils.dealHump(COLUMN_NAME) + "},'%y-%m-%d')\n" +
+                "</if>";
         return s;
     }
 }

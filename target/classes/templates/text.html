@@ -1,6 +1,6 @@
-/**
-*供应商
-*/
-@ExcelProperty(value = "供应商", index = 0)
-@TableField(exist = false)
-private String supplierAbbr;
+<if test="object.orderDate != null">
+    AND date_format((p1.`order_date`),'%y-%m-%d') <![CDATA[ >= ]]> date_format(#{object.orderDate},'%y-%m-%d')
+</if>
+<if test="object.orderDateEnd != null">
+    AND date_format((p1.`order_date`),'%y-%m-%d') <![CDATA[ <= ]]> date_format(#{object.orderDateEnd},'%y-%m-%d')
+</if>
